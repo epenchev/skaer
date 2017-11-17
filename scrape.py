@@ -1,16 +1,35 @@
 import re
 import json
-import urllib2
-from cookielib import CookieJar
+import socket
+
+try:
+    import http.cookiejar as compat_cookiejar
+except ImportError:  # Python 2
+    import cookielib as compat_cookiejar
+
+try:
+    import urllib.request as compat_urllib_request
+except ImportError:  # Python 2
+    import urllib2 as compat_urllib_request
+
+try:
+    import http.client as compat_http_client
+except ImportError:  # Python 2
+    import httplib as compat_http_client
+
+#import urllib2
+#from cookielib import CookieJar
 
 
 class Scraper:
     def __init__(self):
-        self._cookiejar = CookieJar()
-        self._opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self._cookiejar))
+        self._cookiejar = compat_cookiejar.CookieJar()
+        self._opener = compat_urllib_request.build_opener(
+            compat_urllib_request.HTTPCookieProcessor(self._cookiejar))
         self._genres = dict()
         self._movies = dict()
-        self._base_url = 'https://yesmovies.to/'
+        #self._base_url = 'https://yesmovies.to/'
+        self._base_url = 'https://yesmovies.to/movie/filter/movies.html'
         self._headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
             'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
@@ -24,12 +43,12 @@ class Scraper:
 
     def _urlopen(self, url, data=None):
         try:
-            req = urllib2.Request(url, data, self._headers)
+            req = compat_urllib_request.Request(url, data, self._headers)
             response = self._opener.open(req)
             data = response.read()
             response.close()
             return data
-        except (urllib2.URLError, http.client.HTTPException, socket.error) as err:
+        except (compat_urllib_request.URLError, compat_http_client.HTTPException, socket.error) as err:
             print('Got error from urlopen() %s' % err)
         return None
 
@@ -38,9 +57,9 @@ class Scraper:
             root_url = self._links.pop(0)
             data = self._urlopen(root_url)
             if data:
-                self.parse_links(root_url, data)
+                self.parse_links(root_url, data.decode('utf-8'))
 
-        print('Summary, got {0} movies'.format(len(self._movies)))
+        print('Summary, got {} movies'.format(len(self._movies)))
         #print(self._movies.keys())
 
     def parse_links(self, root, data):
