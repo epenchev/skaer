@@ -45,7 +45,7 @@
                                 <li><a href="#Add Library" title="Add Library">Add Library</a></li>
                             </ul>
                         </li>
-                        <li><a onclick="showWindow()" href="javascript:void(0)"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                        <li><a href="#bannerformmodal" data-toggle="modal" data-target="#bannerformmodal"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
                         <li><a href="#Home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
@@ -58,9 +58,7 @@
             </div>
         </nav>
 
-        <script>
-        function showWindow() {
-            <div class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal fade" tabindex="-1" role="dialog" id="bannerformmodal">
             <div class="modal-dialog" role="document">
             <div class="modal-content">
             <div class="modal-header">
@@ -77,8 +75,6 @@
             </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
-        }
-        </script>
 
         <!-- Bootstrap core JavaScript
         ================================================== -->
