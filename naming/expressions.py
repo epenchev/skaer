@@ -26,13 +26,15 @@ year_expr = re.compile(r'(.+[^ _\,\.\(\)\[\]\-])'\
                         '(19[0-9][0-9]|20[0-1][0-9])'\
                         '([ _\,\.\(\)\[\]\-][^0-9]|$)')
 
-video_file_extensions = (
+# Video file extensions
+video_extensions = (
     '.m4v', '.3gp','.nsv','.ts','.ty','.strm','.rm','.rmvb','.m3u','.ifo','.mov','.qt','.divx','.xvid','.bivx',
     '.vob','.nrg','.img','.iso','.pva','.wmv','.asf','.asx','.ogm','.m2v','.avi','.bin','.dat','.dvr-ms',
     '.mpg','.mpeg','.mp4','.mkv','.avc','.vp3','.svq3','.nuv','.viv','.dv','.fli','.flv','.rar','.001','.wpl','.zip'
 )
 
-audio_file_extensions = (
+# A
+audio_extensions = (
     '.nsv','.m4a','.flac','.aac','.strm','.pls','.rm','.mpa','.wav',
     '.wma','.ogg','.opus','.mp3','.mp2','.m3u','.mod','.amf','.669','.dmf','.dsm','.far','.gdm','.imf','.it',
     '.m15','.med','.okt','.s3m','.stm','.sfx','.ult','.uni','.xm','.sid','.ac3','.dts','.cue','.aif',
@@ -45,25 +47,22 @@ subtitle_file_extensions = ('.srt', '.ssa', '.ass', '.sub')
 album_stacking_prefixes = ('disc', 'cd', 'disk', 'vol', 'volume')
 
 
-class ExpessionError(Exception):
-    """ expression generic error. """
-    pass
-
-
 def clean_year(path):
-    match = re.search(year_expr, path)
+    """ Extract the year from the filename if present. """
     try:
+        match = re.search(year_expr, path)
         name, year = match.group(1), int(match.group(2))
         return name, year
     except Exception as err:
-        raise ExpessionError('Error matching name or date %s' % str(err))
+        return tuple()
 
 
 def clean_string(path):
-    for expr in expressions.clean_string_expr:
+    """ Clean the filename out. """
+    for expr in clean_string_expr:
         try:
             found = re.search(expr, path)
-            clean_path = path[0:path.find(found.group(1))]
-            return clean_path
+            return path[0:path.find(found.group(1))]
         except Exception as err:
-            raise ExpessionError('Error clean string %s' % str(err))
+            continue
+    return path
