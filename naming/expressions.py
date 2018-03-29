@@ -33,7 +33,7 @@ video_extensions = (
     '.mpg','.mpeg','.mp4','.mkv','.avc','.vp3','.svq3','.nuv','.viv','.dv','.fli','.flv','.rar','.001','.wpl','.zip'
 )
 
-# A
+# Audio file extensions
 audio_extensions = (
     '.nsv','.m4a','.flac','.aac','.strm','.pls','.rm','.mpa','.wav',
     '.wma','.ogg','.opus','.mp3','.mp2','.m3u','.mod','.amf','.669','.dmf','.dsm','.far','.gdm','.imf','.it',
@@ -42,10 +42,29 @@ audio_extensions = (
     '.adplug','.adx','.dsp','.adp','.ymf','.ast','.afc','.hps','.xsp','.acc','.m4b','.oga','.dsf','.mka'
 )
 
+stub_extensions = ( '.disc', )
+
 subtitle_file_extensions = ('.srt', '.ssa', '.ass', '.sub')
+
+stub_types = {
+    'dvd'   : 'dvd',
+    'hddvd' : 'hddvd',
+    'bluray': 'bluray',
+    'brrip' : 'bluray',
+    'bd25'  : 'bluray',
+    'bd50'  : 'bluray',
+    'vhs'   : 'vhs',
+    'HDTV'  : 'tv',
+    'PDTV'  : 'tv',
+    'DSR'   : 'tv'
+}
 
 album_stacking_prefixes = ('disc', 'cd', 'disk', 'vol', 'volume')
 
+video_extra_types = {
+    r'(?:^|-|\.|_|\s)trailer': 'trailer',
+    r'(?:^|-|\.|_|\s)sample' : 'sample',
+}
 
 def clean_year(path):
     """ Extract the year from the filename if present. """
