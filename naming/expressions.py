@@ -46,7 +46,7 @@ stub_extensions = ( '.disc', )
 
 subtitle_file_extensions = ('.srt', '.ssa', '.ass', '.sub')
 
-stub_types = {
+video_stub_types = {
     'dvd'   : 'dvd',
     'hddvd' : 'hddvd',
     'bluray': 'bluray',
@@ -64,6 +64,13 @@ album_stacking_prefixes = ('disc', 'cd', 'disk', 'vol', 'volume')
 video_extra_types = {
     r'(?:^|-|\.|_|\s)trailer': 'trailer',
     r'(?:^|-|\.|_|\s)sample' : 'sample',
+}
+
+video_3d_types = {
+    'hsbs' : '3d',
+    'sbs'  : '3d',
+    'htab' : '3d',
+    'tab'  : '3d'
 }
 
 def clean_year(path):
