@@ -32,12 +32,22 @@ def parse_video_3d_type(path):
     return None
 
 
+def is_video_file(path):
+    return lower(os.path.splitext(path)[1]) in expr.video_extensions
+
+
+def is_stub_file(path):
+    return lower(os.path.splitext(path)[1]) in expr.stub_extensions
+
+
 def parse_video(path):
     if not path:
         raise RuntimeError('Missing path')
-    stubtype = None
+    if os.path.isdir(path):
+        return None
     filename, ext = os.path.splitext(path)
-    if (ext is None) or (ext not in expr.video_extensions):
+    stubtype = None
+    if ext not in expr.video_extensions:
         stubtype = parse_video_stub_type(path)
     container = ext.strip('.')
     name, year = expr.clean_year(path)
@@ -57,23 +67,15 @@ def parse_video(path):
         'xtype'     : xtype
     }
 
-
 def parse_video_stack(files):
-    pass
+    for f in files:
+        for rexpr in expr.video_file_stack_expr:
+            rexpr
 
 
-def parse_video_dir(path):
-    pass
 
 
-def match_video(path):
-    if os.path.isdir(path):
-        return parse_video_dir(path)
-    else:
-        video_info = parse_video(path)
-        return (video_info,)
-
-def match_audio(path, is_dir):
+def parse_video_list(files):
     pass
 
 
