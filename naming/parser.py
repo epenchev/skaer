@@ -68,9 +68,38 @@ def parse_video(path):
     }
 
 def parse_video_stack(files):
-    for f in files:
+    # Directories are skiped
+    filelist = [f for f in files if not os.path.isdir(f)
+                  and (is_video_file(f) or is_stub_file(f))].sort()
+    stack_result = None
+    for fname in filelist:
+        fidx = 1
         for rexpr in expr.video_file_stack_expr:
-            rexpr
+            match = re.search(rexpr, fname)
+            match_next = re.search(rexpr, filelist[fidx])
+            if not match or match_next:
+                continue
+            title = match.group(1)
+            volume = match.group(2)
+            ignore = match.group(3)
+            title_next = match_next.group(1)
+            volume_next = match_next.group(2)
+            ignore_next = match_next.group(3)
+            if title == title_next \
+                    and volume != volume_next \
+                    and ignore == ignore_next:
+                if os.path.splitext(fname) == os.path.splitext(filelist[fidx]):
+                    stack_files = []
+                    if not stack_result:
+                        stack_files.append(fname)
+                        stack_result = {
+                            'name' : title,
+                            'files' : stack_files
+                        }
+                    stack_files.append(filelist[idx])
+            else:
+                continue
+
 
 
 

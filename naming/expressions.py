@@ -16,9 +16,9 @@ clean_string_expr = (
 )
 
 video_file_stack_expr = (
-    re.compile(r'(.*?)([ _.-]*(?:cd|dvd|p(?:ar)?t|dis[ck])[ _.-]*[0-9]+)(.*?)(\\.[^.]+)$'),
-    re.compile(r'(.*?)([ _.-]*(?:cd|dvd|p(?:ar)?t|dis[ck])[ _.-]*[a-d])(.*?)(\\.[^.]+)$'),
-    re.compile(r'(.*?)([ ._-]*[a-d])(.*?)(\\.[^.]+)$')
+    re.compile(r'(.*?)([ _.-]*(?:cd|dvd|p(?:ar)?t|dis[ck])[ _.-]*[0-9]+)(.*?)$'),
+    re.compile(r'(.*?)([ _.-]*(?:cd|dvd|p(?:ar)?t|dis[ck])[ _.-]*[a-d])(.*?)$'),
+    re.compile(r'(.*?)([ ._-]*[a-d])(.*?)$')
 )
 
 year_expr = re.compile(r'(.+[^ _\,\.\(\)\[\]\-])'\
