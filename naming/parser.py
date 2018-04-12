@@ -74,11 +74,15 @@ def parse_video_stack(files):
     stacks = []
     fidx_offset = 0
     stack_expressions = expressions.video_file_stack_expr
+
     for fidx in range(len(filelist)):
         fname = filelist[fidx]
         if fidx_offset:
-            fidx = fidx_offset - 1
+            fidx += (fidx_offset - 1)
+            if fidx == (len(filelist) - 1):
+                break
         expr_index = 0
+
         while expr_index < len(stack_expressions):
             file_stack = {
                 'name'  : None,
@@ -89,35 +93,34 @@ def parse_video_stack(files):
             if not match:
                 expr_index += 1
                 continue
-            fnext = (fidx + fidx_offset - 1) + 1
+            fnext = fidx + 1
+
             while fnext < len(filelist):
                 stack_files = []
                 match_next = re.search(expr, filelist[fnext])
                 if not match_next:
+                    expr_index += 1
                     break
-                title = match.group(1)
-                volume = match.group(2)
-                ignore = match.group(3)
-                title_next = match_next.group(1)
-                volume_next = match_next.group(2)
-                ignore_next = match_next.group(3)
+                title, volume, ignore = match.group(1), match.group(2), match.group(3)
+                title_next, volume_next, ignore_next = match_next.group(1), match_next.group(2), match_next.group(3)
 
                 if title == title_next \
-                    and volume != volume_next \
-                    and ignore == ignore_next \
+                    and volume != volume_next and ignore == ignore_next \
                     and os.path.splitext(fname)[1] == os.path.splitext(filelist[fnext])[1]:
 
                     if not (file_stack['name']):
                         file_stack['name'] = title
                         file_stack['files'].append(fname)
                     file_stack['files'].append(filelist[fnext])
+                else:
+                    expr_index += 1
+                    break
                 fnext += 1
 
             if len(file_stack['files']):
                 stacks.append(file_stack)
                 fidx_offset += len(file_stack['files']) - 1
                 break
-            expr_index += 1
     return stacks
 
 
