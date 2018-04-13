@@ -25,6 +25,7 @@ class TestVideoStackParser(unittest.TestCase):
             'Bad Boys (2006)-trailer.mkv',
         )
         stack = parser.parse_video_stack(files)
+        print(stack)
         self.assertEqual(len(stack), 1)
 
     def test_parse_dual_stacks(self):
@@ -39,8 +40,10 @@ class TestVideoStackParser(unittest.TestCase):
             '300 (2006) part3.mkv',
             '300 (2006)-trailer.mkv'
         )
-        stack = parser.parse_video_stack(files)
-        self.assertEqual(len(stack), 2)
+        stacks = parser.parse_video_stack(files)
+        for s in stacks:
+            print(s)
+        self.assertEqual(len(stacks), 2)
     
     def test_dirty_names(self):
         files = (
@@ -51,6 +54,7 @@ class TestVideoStackParser(unittest.TestCase):
             "Bad Boys (2006)-trailer.mkv"
         )
         stack = parser.parse_video_stack(files)
+        print(stack)
         self.assertEqual(len(stack), 1)
         #TestStackInfo(result.Stacks[0], "Bad Boys (2006).stv.unrated.multi.1080p.bluray.x264-rough", 4);
 
@@ -72,9 +76,10 @@ class TestVideoStackParser(unittest.TestCase):
             '300c.mkv',
             '300-trailer.mkv'
         )
-        stack = parser.parse_video_stack(files)
-        print(stack)
-        self.assertEqual(len(stack), 3)
+        stacks = parser.parse_video_stack(files)
+        for s in stacks:
+            print(s)
+        self.assertEqual(len(stacks), 3)
 
 
 if __name__ == '__main__':

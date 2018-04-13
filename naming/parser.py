@@ -68,20 +68,16 @@ def parse_video(path):
     }
 
 def parse_video_stack(files):
-    # Directories are skiped
-    filelist = [f for f in files if is_video_file(f) or is_stub_file(f)]
-    filelist.sort()
     stacks = []
-    fidx_offset = 0
-    stack_expressions = expressions.video_file_stack_expr
+    # Directories are skiped
+    file_list = [f for f in files if is_video_file(f) or is_stub_file(f)]
+    file_list.sort()
 
-    for fidx in range(len(filelist)):
-        fname = filelist[fidx]
-        if fidx_offset:
-            fidx += (fidx_offset - 1)
-            if fidx == (len(filelist) - 1):
-                break
+    stack_expressions = expressions.video_file_stack_expr
+    fidx = 0
+    while fidx < len(file_list) - 1:
         expr_index = 0
+        fname = file_list[fidx]
 
         while expr_index < len(stack_expressions):
             file_stack = {
@@ -93,25 +89,26 @@ def parse_video_stack(files):
             if not match:
                 expr_index += 1
                 continue
-            fnext = fidx + 1
 
-            while fnext < len(filelist):
+            fnext = fidx + 1
+            while fnext < len(file_list):
                 stack_files = []
-                match_next = re.search(expr, filelist[fnext])
+                match_next = re.search(expr, file_list[fnext])
                 if not match_next:
                     expr_index += 1
                     break
                 title, volume, ignore = match.group(1), match.group(2), match.group(3)
-                title_next, volume_next, ignore_next = match_next.group(1), match_next.group(2), match_next.group(3)
-
+                title_next = match_next.group(1)
+                volume_next = match_next.group(2)
+                ignore_next = match_next.group(3)
                 if title == title_next \
                     and volume != volume_next and ignore == ignore_next \
-                    and os.path.splitext(fname)[1] == os.path.splitext(filelist[fnext])[1]:
+                    and os.path.splitext(fname)[1] == os.path.splitext(file_list[fnext])[1]:
 
                     if not (file_stack['name']):
                         file_stack['name'] = title
                         file_stack['files'].append(fname)
-                    file_stack['files'].append(filelist[fnext])
+                    file_stack['files'].append(file_list[fnext])
                 else:
                     expr_index += 1
                     break
@@ -119,8 +116,10 @@ def parse_video_stack(files):
 
             if len(file_stack['files']):
                 stacks.append(file_stack)
-                fidx_offset += len(file_stack['files']) - 1
+                fidx += len(file_stack['files'])
                 break
+            else:
+                fidx += 1
     return stacks
 
 
