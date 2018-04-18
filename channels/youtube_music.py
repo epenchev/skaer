@@ -1,5 +1,6 @@
 import json
 import socket
+import gzip
 import http.cookiejar
 import urllib.request
 import urllib.parse
@@ -23,8 +24,8 @@ class YouTubeClient(object):
         req_headers = {
             'Host': 'www.googleapis.com',
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
-            #'Accept-Encoding': 'gzip, deflate',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate',
+            #'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'en-us,en;q=0.5',
             'Connection': 'keep-alive'
         }
@@ -43,15 +44,24 @@ class YouTubeClient(object):
             # TODO use requests module as its support Accept-Encoding': 'gzip, deflate' header
             req = urllib.request.Request(req_url, headers=req_headers)
             response = self._opener.open(req)
-            if response.getheader('content-type', '').startswith('application/json'):
-                result = json.loads(response.read().decode('utf-8'))
+
+            if response.getheader('Content-Encoding', '') == 'gzip':
+                data = gzip.decompress(response.read()).decode('utf-8')
             else:
-                result = response.read().decode('utf-8')
+                data = response.read().decode('utf-8')
+
+            if response.getheader('content-type', '').startswith('application/json'):
+                result = json.loads(data)
+            else:
+                result = data
+
             response.close()
         except (urllib.request.URLError, http.client.HTTPException, socket.error):
             # context.log_error([data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}| error))
+            pass
         except json.JSONDecodeError as json_err:
             # context.log_error([data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}| json_err.msg))
+            pass
         return result
 
 
