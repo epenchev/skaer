@@ -1,22 +1,14 @@
-import json
-import socket
-import gzip
-import http.cookiejar
-import urllib.request
-import urllib.parse
-import http.client
+import requests
 
 class YouTubeClient(object):
     def __init__(self):
         self._api_key = 'AIzaSyBbaFOsbZ-kmMM969-Tdil5-sPO16UozaA'
-        self._cookiejar = http.cookiejar.CookieJar()
-        self._opener = urllib.request.build_opener(
-            urllib.request.HTTPCookieProcessor(self._cookiejar))
-        self._language = 'bg'
+        self._language = 'en'  #'bg'
         self._region = 'BG'
-        self._max_results = 10
+        self._max_results = 2
+        self._category_id = self._get_music_category_id()
 
-    def perform_v3_get_request(self, headers=None, path=None, params=None):
+    def _perform_v3_get_request(self, headers=None, path=None, params=None):
         req_params = {'key': self._api_key}
         if params:
             req_params.update(params)
@@ -24,64 +16,45 @@ class YouTubeClient(object):
         req_headers = {
             'Host': 'www.googleapis.com',
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
-            'Accept-Encoding': 'gzip, deflate',
-            #'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-us,en;q=0.5',
-            'Connection': 'keep-alive'
-        }
+            'Accept-Encoding': 'gzip, deflate' }
 
-        result = None
-        req_url = 'https://www.googleapis.com/youtube/v3/%s?%s' % \
-            (path.strip('/'), urllib.parse.urlencode(req_params))
+        url = 'https://www.googleapis.com/youtube/v3/%s' % path.strip('/')
 
         if headers:
             req_headers.update(headers)
 
-        # TODO get from server environment
-        # context.log_debug('[data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, params, post_data))
+        r = requests.get(url, params=req_params, headers=req_headers)
+        if r.headers.get('content-type', '').startswith('application/json'):
+            return r.json()
+        else:
+            return r.content.decode('utf-8')
 
-        try:
-            # TODO use requests module as its support Accept-Encoding': 'gzip, deflate' header
-            req = urllib.request.Request(req_url, headers=req_headers)
-            response = self._opener.open(req)
-
-            if response.getheader('Content-Encoding', '') == 'gzip':
-                data = gzip.decompress(response.read()).decode('utf-8')
-            else:
-                data = response.read().decode('utf-8')
-
-            if response.getheader('content-type', '').startswith('application/json'):
-                result = json.loads(data)
-            else:
-                result = data
-
-            response.close()
-        except (urllib.request.URLError, http.client.HTTPException, socket.error):
-            # context.log_error([data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}| error))
-            pass
-        except json.JSONDecodeError as json_err:
-            # context.log_error([data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}| json_err.msg))
-            pass
-        return result
+    def _get_music_category_id(self):
+        params = {'part': 'snippet',
+                  'regionCode': self._region,
+                  'hl': 'en'}
+        json_result = self._perform_v3_get_request(path='videoCategories', params=params)
+        for item in json_result['items']:
+            if item['snippet']['title'].startswith('Music'):
+                category_id = int(item['id'])
+                break
+        return category_id
 
 
-    def get_popular_videos(self, page_token=''):
+    def get_popular_music_videos(self, page_token=''):
         params = {'part': 'snippet',
                   'maxResults': str(self._max_results),
                   'regionCode': self._region,
                   'hl': self._language,
-                  'videoCategoryId': 10,
+                  'videoCategoryId': self._category_id,
                   'chart': 'mostPopular'}
         if page_token:
             params['pageToken'] = page_token
-        return self.perform_v3_get_request(path='videos', params=params)
-
-
-    def get_video_categories(self):
-        params = {'part': 'snippet',
-                  'regionCode': self._region,
-                  'hl': 'en' }
-        return self.perform_v3_get_request(path='videoCategories', params=params)
+        res = self._perform_v3_get_request(path='videos', params=params)
+        print(len(res['items']))
+        for item in res['items']:
+            print('%s:%s' % (item['id'], item['snippet']['title']))
+            print(item['snippet']['thumbnails'])
 
 
     def get_videos(self, video_id):
@@ -94,10 +67,11 @@ class YouTubeClient(object):
             video_id = ','.join(video_id)
         params = {'part': 'snippet,contentDetails',
                   'id': video_id}
-        return self.perform_v3_get_request(path='videos', params=params)
+        return self._perform_v3_get_request(path='videos', params=params)
 
 
-    def search(self, q, search_type=['video', 'channel', 'playlist'], channel_id='', order='relevance', safe_search='moderate', page_token=''):
+    def search(self, q, search_type=['video', 'channel', 'playlist'], channel_id='',
+               order='relevance', safe_search='moderate', page_token=''):
         """
         Returns a collection of search results that match the query parameters specified in the API request. By default,
         a search result set identifies matching video, channel, and playlist resources, but you can also configure
@@ -145,28 +119,11 @@ class YouTubeClient(object):
             if params.get(key) is not None:
                 params['type'] = 'video'
                 break
-
-        return self.perform_v3_get_request(path='search', params=params, quota_optimized=False)
-
-
-# Simple example remove after test
-def parse_simple_json():
-    data ='{'\
-    '"kind": "youtube#videoCategory",'\
-    '"etag": "etag",'\
-    '"id": "string",'\
-    '"snippet": {'\
-        '"channelId": "UCBR8-60-B28hp2BmDPdntcQ",'\
-        '"title": "string",'\
-        '"assignable": "boolean"'\
-        '}'\
-    '}'
-    json_data = json.loads(data)
-    print(json_data['snippet']['assignable'])
+        return self._perform_v3_get_request(path='search', params=params, quota_optimized=False)
 
 if __name__ == '__main__':
-    #parse_simple_json()
     client = YouTubeClient()
-    print(client.get_video_categories())
+    res = client.get_popular_music_videos()
+    #print(res)
 
     
