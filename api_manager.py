@@ -4,19 +4,17 @@ from aiohttp import web
 class ApiManager:
     def __init__(self, app):
         self._app = app
-        self._chmngr = self._app['channels']
-        self._libmngr = self._app['libraries']
 
     async def handle_libraries(self, request):
-        response_text = self._libmngr.get_libraries()
+        response_text = request.app.get_libraries()
         return web.Response(text=response_text)
 
     async def handle_channels(self, request):
-        response_text = self._chmngr.get_channels()
+        response_text = self._app.get_channels()
         return web.Response(text=response_text)
 
     async def handle_view(self, request):
-        response_text = self._chmngr.get_channels()
+        response_text = self._app.get_channels()
         return web.Response(text=response_text)
 
     def setup_routes(self):
