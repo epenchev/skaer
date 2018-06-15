@@ -6,12 +6,12 @@ class ApiManager:
         self._app = app
 
     async def handle_libraries(self, request):
-        response_text = request.app.get_libraries()
-        return web.Response(text=response_text)
+        libraries = self._app.get_libraries()
+        return web.json_response(libraries)
 
     async def handle_channels(self, request):
-        response_text = self._app.get_channels()
-        return web.Response(text=response_text)
+        channels = self._app.get_channels()
+        return web.json_response(channels)
 
     async def handle_view(self, request):
         response_text = self._app.get_channels()

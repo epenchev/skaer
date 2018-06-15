@@ -32,8 +32,20 @@ class AppManager(web.Application):
     def run(self, listen_port):
         web.run_app(self, port=listen_port)
 
+    def get_channel_info(self, chan_id):
+        if chan_id in self._channels:
+            instance = self._channels[chan_id][1]
+            if hasattr(instance, 'info'):
+                return instance.get_info()
+            else:
+                # Disable channel
+                pass
+        return None
+
     def get_channels(self):
-        return 'channels list'
+        return { chan_id : chan_attrs[0]
+                 for chan_id, chan_attrs in self._channels.items() }
 
     def get_libraries(self):
-        return 'libraries list'
+        return { lib_id: lib_attrs[0]
+                 for lib_id, lib_attrs in self._libraries.items() }
