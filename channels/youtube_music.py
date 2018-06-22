@@ -1,12 +1,17 @@
 import requests
 
 class YouTubeClient(object):
-    def __init__(self):
+    def __init__(self, app):
+        self._app = app
         self._api_key = 'AIzaSyBbaFOsbZ-kmMM969-Tdil5-sPO16UozaA'
         self._language = 'en'  #'bg'
         self._region = 'BG'
         self._max_results = 2
         self._category_id = self._get_music_category_id()
+
+    def get_info(self):
+        return {'description' : 'Youtube music application that streams only audio',
+                'image'       : '../ui/YouTube_Music.png'}
 
     def _perform_v3_get_request(self, headers=None, path=None, params=None):
         req_params = {'key': self._api_key}
