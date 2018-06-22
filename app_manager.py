@@ -1,23 +1,21 @@
 from aiohttp import web
 
-# Channel format
-# name : (path, class)
+# Channel format -> name : (path, class)
 _CHANELLS = (
     {'YouTube Music': ('channels.youtube_music', 'YouTubeClient')},
     {'YesMovies': ('channels.yesmovies', 'YesMoviesChannel')}
 )
 
-# Library format
-# name : (path, class)
+# Library format -> name : (path, class)
 _LIBRARIES = ()
 
 class AppManager(web.Application):
     def __init__(self):
         super().__init__()
-        self._channels = self._load_modules(_CHANELLS)
-        self._libraries = self._load_modules(_LIBRARIES)
+        self._channels = self._load_modules(_CHANELLS, self._verify_channel)
+        self._libraries = self._load_modules(_LIBRARIES, self._verify_library)
 
-    def _load_modules(self, import_modules):
+    def _load_modules(self, import_modules, verfier):
         loaded = {}
         module_id = 1
         for imp_module in import_modules:
@@ -25,9 +23,23 @@ class AppManager(web.Application):
                 path, klassname = items
                 module = __import__(path, fromlist=(klassname), level=0)
                 instance = getattr(module, klassname)()
-                loaded[module_id] = (name, instance)
-                module_id += 1
+                try:
+                    verfier((name, instance))
+                    loaded[module_id] = (name, instance)
+                    module_id += 1
+                except AttributeError as err:
+                    print('Warning: module [%s] failed verification, %s' % (name, str(err)))
         return loaded
+
+    def _verify_channel(self, chan_entry):
+        name, chan_obj = chan_entry
+        chan_obj.init(self)
+        chan_obj.info()
+
+    def _verify_library(self, library_entry):
+        name, library_obj = library_entry
+        library_obj.init(self)
+        library_obj.info()
 
     def run(self, listen_port):
         web.run_app(self, port=listen_port)
@@ -35,11 +47,8 @@ class AppManager(web.Application):
     def get_channel_info(self, chan_id):
         if chan_id in self._channels:
             instance = self._channels[chan_id][1]
-            if hasattr(instance, 'info'):
-                return instance.get_info()
-            else:
-                # Disable channel
-                pass
+            return instance.get_info()
+        print('Warning: no channel with this id : [%i]' % chan_id)
         return None
 
     def get_channels(self):
