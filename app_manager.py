@@ -14,6 +14,7 @@ class AppManager(web.Application):
         super().__init__()
         self._channels = self._load_modules(_CHANELLS, self._verify_channel)
         self._libraries = self._load_modules(_LIBRARIES, self._verify_library)
+        self.setup_api_routes()
 
     def _load_modules(self, import_modules, verfier):
         loaded = {}
@@ -74,3 +75,49 @@ class AppManager(web.Application):
     def get_libraries(self):
         return { lib_id: lib_attrs[0]
                  for lib_id, lib_attrs in self._libraries.items() }
+
+    async def handle_libraries(self, request):
+        libraries = self.get_libraries()
+        return web.json_response(libraries)
+
+    async def handle_channels(self, request):
+        channels = self.get_channels()
+        return web.json_response(channels)
+
+    async def handle_view(self, request):
+        response_text = self.get_channels()
+        return web.Response(text=response_text)
+
+    async def handle_get_channel(self, request):
+        info = self.get_channel_info(int(request.match_info['id']))
+        return web.json_response(info)
+
+    async def handle_get_channel_items(self, request):
+        items = await self.get_channel_items(int(request.match_info['id']))
+        return web.json_response(items)
+
+    async def handle_get_channel_item(self, request):
+        item = self.get_channel_item(request.match_info['id'], request.match_info['item'])
+        return web.json_response(item)
+
+    def setup_api_routes(self):
+        self.router.add_get('/', self.handle_view)
+        self.router.add_get('/ui', self.handle_view)
+        self.router.add_get('/channels', self.handle_channels)
+        self.router.add_get('/libraries', self.handle_libraries)
+        self.router.add_get(r'/channels/{id}', self.handle_get_channel)
+        self.router.add_get(r'/channels/{id}/items', self.handle_get_channel_items)
+        self.router.add_get(r'/channels/{id}/{item}', self.handle_get_channel_item)
+        # Disabled for now, but will be part of the future api
+        '''
+        self.router.add_get('/users')
+        self.router.add_get(r'/users/{id}')
+        self.router.add_get(r'/channels/play/{id}/{item}')
+        self.router.add_get(r'/libraries/{id}')
+        self.router.add_get(r'/libraries/scan/{id}')
+        self.router.add_get(r'/libraries/{id}/{item}')
+        self.router.add_get(r'/libraries/play/{id}/{item}')
+        self.router.add_get(r'/devices')
+        self.router.add_get(r'/devices/{id}')
+        '''
+
