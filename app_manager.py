@@ -34,6 +34,10 @@ class AppManager(web.Application):
     def _verify_channel(self, chan_entry):
         name, chan_obj = chan_entry
         chan_obj.get_info()
+        if not hasattr(chan_obj, 'get_info'):
+            raise AttributeError
+        if not hasattr(chan_obj, 'get_items'):
+            raise AttributeError
 
     def _verify_library(self, library_entry):
         name, library_obj = library_entry
@@ -49,16 +53,16 @@ class AppManager(web.Application):
         print('Warning: no channel with this id : [%s]' % chan_id)
         return None
 
+    async def get_channel_items(self, chan_id):
+        if chan_id in self._channels:
+            instance = self._channels[chan_id][1]
+            return await instance.get_items()
+        print('Warning: no channel with this id : [%s]' % chan_id)
+        return None
+
     def get_channels(self):
         return { chan_id : chan_attrs[0]
                  for chan_id, chan_attrs in self._channels.items() }
-
-    def get_channel_items(self, chan_id):
-        if chan_id in self._channels:
-            instance = self._channels[chan_id][1]
-            return instance.get_items()
-        print('Warning: no channel with this id : [%s]' % chan_id)
-        return None
 
     def get_channel_item(self, chan_id, item_id):
         if chan_id in self._channels:

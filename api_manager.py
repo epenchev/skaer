@@ -22,7 +22,7 @@ class ApiManager:
         return web.json_response(info)
 
     async def get_channel_items(self, request):
-        items = self._app.get_channel_items(request.match_info['id'])
+        items = await self._app.get_channel_items(int(request.match_info['id']))
         return web.json_response(items)
 
     async def get_channel_item(self, request):

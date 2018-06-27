@@ -1,44 +1,51 @@
-import requests
+import aiohttp
+import asyncio
+
 
 class YouTubeClient(object):
     def __init__(self, app):
         self._app = app
+        self._loop = app.loop
         self._api_key = 'AIzaSyBbaFOsbZ-kmMM969-Tdil5-sPO16UozaA'
         self._language = 'en'  #'bg'
         self._region = 'BG'
-        self._max_results = 2
-        self._category_id = self._get_music_category_id()
+        self._max_results = 10
+        self.req_headers = {
+            'Host': 'www.googleapis.com',
+            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
+            'Accept-Encoding': 'gzip, deflate'
+        }
+        self.api_url = 'https://www.googleapis.com/youtube/v3/'
+
 
     def get_info(self):
-        return {'description' : 'Youtube music application that streams only audio',
-                'image'       : '../ui/YouTube_Music.png'}
+        return { 'description' : 'Youtube music application that streams only audio',
+                 'image'       : '../ui/YouTube_Music.png',
+                 'type'        : 'Audio' }
 
-    def _perform_v3_get_request(self, headers=None, path=None, params=None):
+
+    async def perform_v3_get_request(self, headers=None, path=None, params=None):
         req_params = {'key': self._api_key}
         if params:
             req_params.update(params)
-
-        req_headers = {
-            'Host': 'www.googleapis.com',
-            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
-            'Accept-Encoding': 'gzip, deflate' }
-
-        url = 'https://www.googleapis.com/youtube/v3/%s' % path.strip('/')
-
+        req_headers = self.req_headers
+        url = self.api_url + path.strip('/')
         if headers:
             req_headers.update(headers)
+        async with aiohttp.ClientSession(headers=req_headers, loop=self._loop) as client:
+            async with client.get(url, params=req_params) as resp:
+                assert resp.status == 200
+                if resp.headers.get('content-type', '').startswith('application/json'):
+                    return await resp.json()
+                else:
+                    return await resp.text('utf-8')
 
-        r = requests.get(url, params=req_params, headers=req_headers)
-        if r.headers.get('content-type', '').startswith('application/json'):
-            return r.json()
-        else:
-            return r.content.decode('utf-8')
 
-    def _get_music_category_id(self):
+    async def get_music_category_id(self):
         params = {'part': 'snippet',
                   'regionCode': self._region,
                   'hl': 'en'}
-        json_result = self._perform_v3_get_request(path='videoCategories', params=params)
+        json_result = await self.perform_v3_get_request(path='videoCategories', params=params)
         for item in json_result['items']:
             if item['snippet']['title'].startswith('Music'):
                 category_id = int(item['id'])
@@ -46,20 +53,28 @@ class YouTubeClient(object):
         return category_id
 
 
-    def get_popular_music_videos(self, page_token=''):
+    async def get_popular_music_videos(self, page_token=''):
+        category_id = await self.get_music_category_id()
         params = {'part': 'snippet',
                   'maxResults': str(self._max_results),
                   'regionCode': self._region,
                   'hl': self._language,
-                  'videoCategoryId': self._category_id,
+                  'videoCategoryId': category_id,
                   'chart': 'mostPopular'}
         if page_token:
             params['pageToken'] = page_token
-        res = self._perform_v3_get_request(path='videos', params=params)
-        print(len(res['items']))
+        res = await self.perform_v3_get_request(path='videos', params=params)
+        channel_items = {}
         for item in res['items']:
-            print('%s:%s' % (item['id'], item['snippet']['title']))
-            print(item['snippet']['thumbnails'])
+            channel_items[item['id']] = ( item['snippet']['title'],
+                                          item['snippet']['thumbnails']['medium']['url'] )
+        for itm in channel_items.items():
+            print(itm)
+        return channel_items
+
+
+    async def get_items(self):
+        return await self.get_popular_music_videos()
 
 
     def get_videos(self, video_id):
@@ -127,8 +142,8 @@ class YouTubeClient(object):
         return self._perform_v3_get_request(path='search', params=params, quota_optimized=False)
 
 if __name__ == '__main__':
-    client = YouTubeClient()
-    res = client.get_popular_music_videos()
-    #print(res)
+    loop = asyncio.get_event_loop()
+    client = YouTubeClient(loop)
+    loop.run_until_complete(client.get_popular_music_videos())
 
     
