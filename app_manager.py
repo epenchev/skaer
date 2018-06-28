@@ -88,6 +88,10 @@ class AppManager(web.Application):
         response_text = self.get_channels()
         return web.Response(text=response_text)
 
+    async def handle_redirect_ui(self, request):
+        location = request.app.router['ui'].url_for(filename='index.html')
+        raise web.HTTPFound(location=location)
+
     async def handle_get_channel(self, request):
         info = self.get_channel_info(int(request.match_info['id']))
         return web.json_response(info)
@@ -100,24 +104,38 @@ class AppManager(web.Application):
         item = self.get_channel_item(request.match_info['id'], request.match_info['item'])
         return web.json_response(item)
 
+    async def handle_play_channel_item(self):
+        pass
+
+    async def handle_libraries(self):
+        pass
+
+    async def handle_get_library(self):
+        pass
+
+    async def handle_scan_library(self):
+        pass
+
+    async def handle_get_library_items(self):
+        pass
+
+    async def handle_get_library_item(self):
+        pass
+
     def setup_api_routes(self):
-        self.router.add_get('/', self.handle_view)
-        self.router.add_get('/ui', self.handle_view)
-        self.router.add_get('/channels', self.handle_channels)
-        self.router.add_get('/libraries', self.handle_libraries)
+        # User interface
+        self.router.add_get('/', self.handle_redirect_ui)
+        self.router.add_static(r'/ui', 'ui/', name='ui')
+        # Channel API
+        self.router.add_get(r'/channels', self.handle_channels)
         self.router.add_get(r'/channels/{id}', self.handle_get_channel)
         self.router.add_get(r'/channels/{id}/items', self.handle_get_channel_items)
-        self.router.add_get(r'/channels/{id}/{item}', self.handle_get_channel_item)
-        # Disabled for now, but will be part of the future api
-        '''
-        self.router.add_get('/users')
-        self.router.add_get(r'/users/{id}')
-        self.router.add_get(r'/channels/play/{id}/{item}')
-        self.router.add_get(r'/libraries/{id}')
-        self.router.add_get(r'/libraries/scan/{id}')
-        self.router.add_get(r'/libraries/{id}/{item}')
-        self.router.add_get(r'/libraries/play/{id}/{item}')
-        self.router.add_get(r'/devices')
-        self.router.add_get(r'/devices/{id}')
-        '''
+        self.router.add_get(r'/channels/{id}/items/{item_id}', self.handle_get_channel_item)
+        self.router.add_get(r'/channels/{id}/play/{item_id}', self.handle_play_channel_item)
+        # Library API
+        self.router.add_get(r'/libraries', self.handle_libraries)
+        self.router.add_get(r'/libraries/{id}', self.handle_get_library)
+        self.router.add_get(r'/libraries/scan/{id}', self.handle_scan_library)
+        self.router.add_get(r'/libraries/{id}/items', self.handle_get_library_items)
+        self.router.add_get(r'/libraries/play/{id}/{item}', self.handle_get_library_item)
 
