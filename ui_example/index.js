@@ -4,5 +4,10 @@ $(document).ready(function () {
     $('#wrapper').toggleClass("open");
     $('.side-nav').toggleClass("d-none");
     e.preventDefault();
+
+    $('a').click(function(){
+        $('a').removeClass("active");
+        $(this).addClass("active");
+    });
   });
 });
