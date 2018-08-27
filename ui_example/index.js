@@ -5,7 +5,7 @@ $(document).ready(function () {
     $('.side-nav').toggleClass("d-none");
     e.preventDefault();
 
-    $('a').click(function(){
+    $('a').click(function() {
         $('a').removeClass("active");
         $(this).addClass("active");
     });
