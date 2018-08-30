@@ -10,7 +10,7 @@ body{background:#f9f9f9;}
 #wrapper{padding: 90px 15px 15px 75px; }
 #wrapper.open{padding: 90px 15px 15px 225px; }
 .navbar-nav.side-nav.open {left:0;}
-.side-nav li a {padding: 15px;}
+.side-nav li a {padding: 12px;}
 .navbar-nav li a .shortmenu {float: right;display: block;opacity: 1}
 .navbar-nav.side-nav.open.navbar-nav li a .shortmenu {opacity: 0}
 .navbar-nav.side-nav{background: #585f66;box-shadow: 2px 1px 2px rgba(0,0,0,.1);position:fixed;top:56px;flex-direction: column!important;left:-140px;width:200px;overflow-y:auto;bottom:0;overflow-x:hidden;padding-bottom:35px}
@@ -33,11 +33,11 @@ html body {
 }
 
 a:hover, a:focus{
-    background-color: #333;
+    background-color: rgb(80,80,80);
     /*color: #fff;*/
 }
 
 .active{
-    background-color: #333;
+    background-color: #333333;
     /*color: #fff;*/
 }
