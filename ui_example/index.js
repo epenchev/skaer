@@ -9,5 +9,6 @@ $(document).ready(function () {
         $('a').removeClass("active");
         $(this).addClass("active");
     });
+
   });
 });

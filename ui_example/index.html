@@ -23,14 +23,33 @@
 <body>
   <div id="wrapper" class="animate">
     <nav class="navbar header-top fixed-top navbar-expand-lg navbar-dark navbar-custom">
-      <span class="navbar-toggler-icon leftmenutrigger"></span>
-      <a class="navbar-brand" href="#">LOGO</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText"
+      <!-- <span class="navbar-toggler-icon leftmenutrigger"></span> -->
+      <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="navbar-toggler-icon dropdown"></span>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="z-index:5">
+              <a class="dropdown-item" href="#"><i class="fas fa-plus fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Add collection</span></a>
+              <div class="dropdown-divider" style="border-color:#333333;"></div>
+              <a class="dropdown-item" href="#"><i class="fas fa-film fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Movies</span></a>
+              <a class="dropdown-item" href="#"><i class="fas fa-tv fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">TV Shows</span></a>
+              <div class="dropdown-divider" style="border-color:#333333;"></div>
+              <a class="dropdown-item" href="#"><i class="fas fa-video fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Videos</span></a>
+              <a class="dropdown-item" href="#"><i class="fas fa-music fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Music</span></a>
+              <div class="dropdown-divider" style="border-color:#333333;"></div>
+              <a class="dropdown-item" href="#"><i class="fas fa-cog fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Settings</span></a>
+          </div>
+      </li>
+      <!-- <a class="navbar-brand" href="#">LOGO</a> -->
+      <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText"
         aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
-      </button>
+      </button> -->
       <div class="collapse navbar-collapse" id="navbarText">
         <ul class="navbar-nav side-nav bg-my-dark d-none">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Add collection<i class="fas fa-plus fa-xs"></i></a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Movies<i class="fas fa-film fa-xs"></i></a>
           </li>
@@ -49,10 +68,19 @@
         </ul>
         <ul class="navbar-nav ml-md-auto d-md-flex">
           <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fas fa-user fa-xs"></i> Profile</a>
+            <!-- <a class="nav-link" href="#"><i class="fas fa-user fa-xs"></i> Profile</a> -->
+            <a class="nav-link" href="#">Profile</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fas fa-key fa-xs"></i> Logout</a>
+          <li class="nav-item dropdown">
+            <!-- <a class="nav-link" href="#"><i class="fas fa-key fa-xs"></i> Logout</a> -->
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-key fa-xs"></i>
+            </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                </div>
           </li>
         </ul>
       </div>
