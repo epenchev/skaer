@@ -1,132 +1,55 @@
 <!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <link rel="icon" href="img/favicon.ico">
+<html>
 
-        <title>Skaer Media Server</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Skaer Media Server</title>
+    <link href="css/bootstrap-4.1.3/bootstrap.css" rel="stylesheet">
+    <link href="css/skaer.css" rel="stylesheet">
+</head>
 
-        <!-- Bootstrap core CSS -->
-        <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
-         <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
-        <!-- Custom styles for this template -->
-        <link href="starter-template.css" rel="stylesheet">
-
-        <link href="docs.min.css" rel="stylesheet">
-    </head>
-
-    <body>
-        <nav class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container-fluid">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown" aria-labelledby="dropdownMenuDivider">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <span class="glyphicon glyphicon-film"></span> Movies <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#Genre" title="Genre">Genre</a></li>
-                                <li><a href="#Country" title="Country">Country</a></li>
-                                <li><a href="#Year" title="Year">Year</a></li>
-                                <li><a href="#Year" title="Resolution">Resolution</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="#Add Library" title="Add Library">Add Library</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown" aria-labelledby="dropdownMenuDivider">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <span class="glyphicon glyphicon-music"></span> Music <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#Genre" title="Genre">Genre</a></li>
-                                <li><a href="#Country" title="Country">Country</a></li>
-                                <li><a href="#Collection" title="Collection">Collection</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="#Add Library" title="Add Library">Add Library</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="#bannerformmodal" data-toggle="modal" data-target="#bannerformmodal"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
-                        <li><a href="#Home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#"><span class="glyphicon glyphicon-signal"></span></a></li>
-                    </ul>
-                    <form class="navbar-form navbar-right">
-                        <input class="form-control" placeholder="Search..." type="text">
-                    </form>
+<body>
+    <!-- Navbar -->
+    <div id="wrapper" class="animate">
+        <nav class="navbar header-top fixed-top navbar-expand-lg navbar-dark navbar-custom">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-bars fa-xs" style="font-size:20px; color:rgba(255,255,255,0.88);"></i>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="z-index:5">
+                    <a class="dropdown-item" href="#"><i class="fas fa-plus fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Add collection</span></a>
+                    <div class="dropdown-divider" style="border-color:#333333;"></div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-video fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Video</span></a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-music fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Music</span></a>
+                    <div class="dropdown-divider" style="border-color:#333333;"></div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-cog fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Settings</span></a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-question-circle fa-fw" style="font-size:20px;margin-left:-4px;margin-right:8px"></i><span style="position:relative;left:20px;">Help</span></a>
                 </div>
-            </div>
+            </li>
+
+            <form class="form1">
+                <input class="sk-searchbox" type="text" placeholder="Search" aria-label="Search">
+                <button type="submit" class="sk-searchbutton"><i class="fas fa-search fa-fw"></i></button>
+            </form>
         </nav>
+    </div>
 
-        <!-- <div class=".container-fluid"> -->
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-6 col-md-2">
-                    <a href="#">
-                        <img class="thumbnail" style="height: 228px; width: 157px; display: block;" src="https://img.yescdn.ru/2018/01/03/poster/1750faeab58097f03b32c726eea1ea53-cranium-intel.jpg">
-                    </a>
-                </div>
-                <div class="col-xs-6 col-md-2">
-                    <a href="#">
-                        <img class="thumbnail" style="height: 228px; width: 157px; display: block;" src="https://img.yescdn.ru/2018/01/03/poster/1750faeab58097f03b32c726eea1ea53-cranium-intel.jpg">
-                    </a>
-                </div>
-                <div class="col-xs-6 col-md-2">
-                    <a href="#">
-                        <img class="thumbnail" style="height: 228px; width: 157px; display: block;" src="https://img.yescdn.ru/2018/01/03/poster/1750faeab58097f03b32c726eea1ea53-cranium-intel.jpg">
-                    </a>
-                </div>
-                <div class="col-xs-6 col-md-2">
-                    <a href="#">
-                        <img class="thumbnail" style="height: 228px; width: 157px; display: block;" src="https://img.yescdn.ru/2018/01/03/poster/1750faeab58097f03b32c726eea1ea53-cranium-intel.jpg">
-                    </a>
-                </div>
-                <div class="col-xs-6 col-md-2">
-                    <a href="#">
-                        <img class="thumbnail" style="height: 228px; width: 157px; display: block;" src="https://img.yescdn.ru/2018/01/03/poster/1750faeab58097f03b32c726eea1ea53-cranium-intel.jpg">
-                    </a>
-                </div>
-                <div class="col-xs-6 col-md-2">
-                    <a href="#">
-                        <img class="thumbnail" style="height: 228px; width: 157px; display: block;" src="https://img.yescdn.ru/2018/01/03/poster/1750faeab58097f03b32c726eea1ea53-cranium-intel.jpg">
-                    </a>
-                </div>
-            </div>
-            </div>
-        <!-- </div> -->
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <script src="js/fontawesome-5.0.6.js"></script>
+  <script src="js/bootstrap-4.1.3/bootstrap.js"></script>
 
-        <div class="modal fade" tabindex="-1" role="dialog" id="bannerformmodal">
-            <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Modal title</h4>
-            </div>
-            <div class="modal-body">
-            <p>One fine body&hellip;</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-            </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
+<!-- <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script> -->
+  <!-- Bootstrap core JavaScript
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+    -->
+  <script src="js/skaer.js"></script>
+</body>
 
-        <!-- Bootstrap core JavaScript
-        ================================================== -->
-        <!-- Placed at the end of the document so the pages load faster -->
-        <script src="js/jquery-slim.min.js"></script>
-        <script>window.jQuery || document.write('<script src="js/jquery-slim.min.js"><\/script>')</script>
-        <script src="js/popper.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
-    </body>
 </html>
+

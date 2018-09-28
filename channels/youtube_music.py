@@ -87,7 +87,7 @@ class YouTubeClient(object):
             video_id = ','.join(video_id)
         params = {'part': 'snippet,contentDetails',
                   'id': video_id}
-        return self._perform_v3_get_request(path='videos', params=params)
+        return self.perform_v3_get_request(path='videos', params=params)
 
 
     def search(self, q, search_type=['video', 'channel', 'playlist'], channel_id='',
@@ -139,7 +139,7 @@ class YouTubeClient(object):
             if params.get(key) is not None:
                 params['type'] = 'video'
                 break
-        return self._perform_v3_get_request(path='search', params=params, quota_optimized=False)
+        return self.perform_v3_get_request(path='search', params=params, quota_optimized=False)
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

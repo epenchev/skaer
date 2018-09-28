@@ -107,8 +107,8 @@ class AppManager(web.Application):
     async def handle_play_channel_item(self):
         pass
 
-    async def handle_libraries(self):
-        pass
+    #async def handle_libraries(self):
+    #    pass
 
     async def handle_get_library(self):
         pass
