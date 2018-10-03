@@ -10,11 +10,6 @@ html body {
     outline: none;
 }
 
-.navbar-nav a:hover,
-.navbar-nav a:focus {
-  color: #555555;
-}
-
 .sk-navbar-icon {
     font-size: 20px;
     color: rgba(255,255,255,0.88);
@@ -32,6 +27,12 @@ html body {
     font-size: 14px;
     font-weight: 400;
     line-height: 25px;
+}
+
+.navbar > li > .dropdown-menu > a:hover,
+.navbar > li > .dropdown-menu > a:focus {
+    background-color: #555555;
+    background-image: none;
 }
 
 .sk-dropdown-item {
