@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "name": "YesMovies",
+        "cover_image": "yes-movies.jpg"
+    },
+    {
+        "id": 2,
+        "name": "YouTube Music",
+        "cover_image": "y-music.jpeg"
+    },
+    {
+        "id": 3,
+        "name" : "Home Movie collection Vol.1",
+        "cover_image": "videos.png"
+    }
+]
