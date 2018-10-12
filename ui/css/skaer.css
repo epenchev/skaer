@@ -131,12 +131,7 @@ html body {
     text-align: center;
     margin: 50px auto 60px;
     padding: 0 40px;
-}
-
-.view-panel.visible {
-    opacity: 1;
-    transition: 1s;
-    pointer-events: auto;
+    opacity: 0;
 }
 
 @media (max-width: 600px) {
@@ -158,6 +153,7 @@ html body {
     font-size: 0;
 }
 
+.view-panel.visible,
 .collections-list.visible {
     opacity: 1;
     transition: 1s;
@@ -174,12 +170,13 @@ html body {
     text-align:left;
     font:normal 12px sans-serif;
 
-    margin: 0 12px 14px 0;
+    margin: 0 50px 15px 0;
     padding: 5px;
 }
 
 .collections-list > li.hidden {
-    opacity: 0.2;
+    /* opacity: 0.2; */
+    opacity: 0;
     pointer-events: none;
 }
 
@@ -195,11 +192,10 @@ html body {
 /* Collection name */
 .collections-list h2 a {
     text-decoration: none;
-    font-size: 18px;
+    font-size: 16px;
     /*color: #2B2E31;*/
     color: rgba(255,255,255,0.88);
     display: block;
-    font-size: 16px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
