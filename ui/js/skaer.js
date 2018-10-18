@@ -1,36 +1,41 @@
 $(function () {
-    var mediaCollections = []
-    $.getJSON( "media_collections.json", function( data ) {
-        mediaCollections = data;
-        generateMediaCollectionsHTML(mediaCollections);
-        renderViewPanel(mediaCollections);
-    });
+    // Display all collections on page load
+    showCollections('');
+    // Install actions for main dropdown
+    $('#videos').click(function() { showCollections('video'); return true; });
+    $('#music').click(function() { showCollections('music'); return true; });
 
-    function renderViewPanel(data) {
-        // Iterate over all of the collections
-        // If their ID is somewhere in the data object remove the hidden class to reveal them.
-        collections.each(function () {
-		    var that = $(this);
-
-            data.forEach(function (item) {
-                if( that.data('index') == item.id) {
-                    that.removeClass('hidden');
-                }
-            });
-        });
-
-        // Show the view-panel
-        // (the render function hides all pages so we need to show the one we want).
-        $('.view-panel').addClass('visible');
-        $('.collections-list').addClass('visible');
-    }
-
-	function generateMediaCollectionsHTML(data) {
+    function generateCollectionsHTML(data) {
         var list = $('.view-panel .collections-list');
         var theTemplateScript = $("#collections-template").html();
 
+        // remove current elements from the list
+        while (list.children('li').length) {
+            list.children('li').remove();
+        }
         // Compile the template​
         var theTemplate = Handlebars.compile(theTemplateScript);
         list.append(theTemplate(data));
-	}
+    }
+
+    // collType can be one of 'video', 'music' or '' for all types
+    function showCollections(collType) {
+        $('.view-panel').removeClass('visible');
+        $('.collections-list').removeClass('visible');
+
+        $.getJSON("media_collections.json", function( data ) {
+            if (collType != '') {
+                var collIndex = 0;
+                data.forEach(function (item) {
+                    if (item.category.toLowerCase() != collType.toLowerCase())
+                        data.splice(collIndex, 1);
+                    collIndex += 1;
+                });
+            }
+            generateCollectionsHTML(data);
+            // Show the view-panel
+            $('.view-panel').addClass('visible');
+            $('.collections-list').addClass('visible');
+        });
+    }
 });

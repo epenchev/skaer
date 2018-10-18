@@ -2,19 +2,19 @@
     {
         "id": 1,
         "name": "YesMovies",
-        "cover_image": "yes-movies.jpg",
+        "cover_image": "images/yes-movies.jpg",
         "category": "Video"
     },
     {
         "id": 2,
         "name": "YouTube Music",
-        "cover_image": "y-music.jpeg",
+        "cover_image": "images/y-music.jpeg",
         "category": "Music"
     },
     {
         "id": 3,
         "name" : "Home Movies Vol.1",
-        "cover_image": "videos.png",
+        "cover_image": "images/videos.png",
         "category": "Video"
     }
 ]

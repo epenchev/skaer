@@ -146,7 +146,7 @@ html body {
     display: table;
     list-style: none;
     margin-left: 300px;
-    max-width: 1200px;
+    max-width: 1400px;
     text-align: center;
     padding: 0;
     opacity: 0; /* invisible */
@@ -156,7 +156,7 @@ html body {
 .view-panel.visible,
 .collections-list.visible {
     opacity: 1;
-    transition: 1s;
+    transition: 0.2s;
     pointer-events: auto;
 }
 
@@ -172,12 +172,6 @@ html body {
 
     margin: 0 50px 15px 0;
     padding: 5px;
-}
-
-.collections-list > li.hidden {
-    /* opacity: 0.2; */
-    opacity: 0;
-    pointer-events: none;
 }
 
 .collections-list .cover-photo {
@@ -248,7 +242,7 @@ html body {
 @media (max-width: 1200px) {
 
     collections-list {
-        margin-left: 200px;
+        margin-left: 170px;
     }
     .collections-list .cover-photo {
         width: 170px;
