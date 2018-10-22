@@ -23,7 +23,7 @@ $(function () {
         $('.view-panel').removeClass('visible');
         $('.collections-list').removeClass('visible');
 
-        $.getJSON("media_collections.json", function( data ) {
+        $.getJSON("/collections", function( data ) {
             if (collType != '') {
                 var collIndex = 0;
                 data.forEach(function (item) {

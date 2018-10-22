@@ -81,8 +81,6 @@ class MediaController:
         return web.Response(text=lib_output)
     '''
 
-
-
 if __name__ == '__main__':
     loop = None
     if sys.platform == 'win32':
