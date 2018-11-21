@@ -1,11 +1,16 @@
+import sys
 import aiohttp
 import asyncio
+import youtube_dl
 
 
 class YouTubeClient(object):
-    def __init__(self, app):
-        self._app = app
-        self._loop = app.loop
+    def __init__(self, **kwargs):
+        self._app = kwargs.get('app')
+        if self._app is None:
+            self._loop = kwargs.get('loop')
+        else:
+            self._loop = self._app.loop
         self._api_key = 'AIzaSyBbaFOsbZ-kmMM969-Tdil5-sPO16UozaA'
         self._language = 'en'  #'bg'
         self._region = 'BG'
@@ -53,10 +58,21 @@ class YouTubeClient(object):
         return category_id
 
 
-    async def get_popular_music_videos(self, page_token=''):
+    async def get_popular_music_videos(self, page_token=None, max_results=None):
+        """
+        Returns a list of the most popular music videos for that region.
+        :param page_token: fetch a concrete page
+        :max_results: max results to return
+        :return:
+        """
         category_id = await self.get_music_category_id()
+        if max_results:
+            maxres = max_results
+        else:
+            maxres = self._max_results
+
         params = {'part': 'snippet',
-                  'maxResults': str(self._max_results),
+                  'maxResults': str(maxres),
                   'regionCode': self._region,
                   'hl': self._language,
                   'videoCategoryId': category_id,
@@ -64,17 +80,16 @@ class YouTubeClient(object):
         if page_token:
             params['pageToken'] = page_token
         res = await self.perform_v3_get_request(path='videos', params=params)
+        if 'nextPageToken' in res:
+            next_page = res['nextPageToken']
+        else:
+            next_page = None
+
         channel_items = {}
         for item in res['items']:
             channel_items[item['id']] = ( item['snippet']['title'],
                                           item['snippet']['thumbnails']['medium']['url'] )
-        for itm in channel_items.items():
-            print(itm)
-        return channel_items
-
-
-    async def get_items(self):
-        return await self.get_popular_music_videos()
+        return channel_items, res['pageInfo']['totalResults'], next_page
 
 
     def get_videos(self, video_id):
@@ -141,9 +156,46 @@ class YouTubeClient(object):
                 break
         return self.perform_v3_get_request(path='search', params=params, quota_optimized=False)
 
+    get_items = get_popular_music_videos
+
+
+async def test_get_items(client, max_res=5):
+    chan_items, total, next_page = await client.get_items(max_results=max_res)
+    while total:
+        total -= len(chan_items)
+        if total < max_res:
+            max_results = total
+        for item in chan_items.items():
+            print(item)
+        print('-------------------')
+        chan_items, _, next_page = await client.get_items(page_token=next_page,
+                                                          max_results=max_res)
+
+
+async def get_play_url(id, loop):
+    play_url = ('https://www.youtube.com/watch?v=%s' % id)
+    print(play_url)
+    opts = ' -x --audio-format mp3 --audio-quality 9 --ffmpeg-location ../bin/ffmpeg-4.1-64bit/ffmpeg %s' % play_url
+    p = await asyncio.create_subprocess_shell('../bin/youtube-dl' + opts,
+                                             stdout=asyncio.subprocess.PIPE,
+                                             stderr=asyncio.subprocess.PIPE,
+                                             shell=True,
+                                             loop=loop)
+    out, err = await p.communicate()
+    print(out.decode('utf-8'))
+    print(p.returncode)
+    #output = await proc.communicate()[0]
+    #if not proc.returncode:
+    #    filename = [line for line in output if line.startswith('[ffmpeg] Destination:')]
+    #    print(filename)
+
+
+
+
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    client = YouTubeClient(loop)
-    loop.run_until_complete(client.get_popular_music_videos())
+    #client = YouTubeClient(app=None, loop=loop)
+    # loop.run_until_complete(test_get_items(client))
+    loop.run_until_complete(get_play_url('hvCVJ62kT8Y', loop))
 
     
