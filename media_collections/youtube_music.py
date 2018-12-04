@@ -1,8 +1,14 @@
 import sys
 import aiohttp
 import asyncio
-import youtube_dl
 
+
+from youtubedl import AsyncYouTubeDl
+from config import (
+    get_tmpdir,
+    get_ffmpeg_path,
+    get_youtubedl_path
+)
 
 class YouTubeClient(object):
     def __init__(self, **kwargs):
@@ -21,7 +27,7 @@ class YouTubeClient(object):
             'Accept-Encoding': 'gzip, deflate'
         }
         self.api_url = 'https://www.googleapis.com/youtube/v3/'
-
+        
 
     def get_info(self):
         return { 'description' : 'Youtube music application that streams only audio',
@@ -174,28 +180,13 @@ async def test_get_items(client, max_res=5):
 
 async def get_play_url(id, loop):
     play_url = ('https://www.youtube.com/watch?v=%s' % id)
-    print(play_url)
-    opts = ' -x --audio-format mp3 --audio-quality 9 --ffmpeg-location ../bin/ffmpeg-4.1-64bit/ffmpeg %s' % play_url
-    p = await asyncio.create_subprocess_shell('../bin/youtube-dl' + opts,
-                                             stdout=asyncio.subprocess.PIPE,
-                                             stderr=asyncio.subprocess.PIPE,
-                                             shell=True,
-                                             loop=loop)
-    out, err = await p.communicate()
-    print(out.decode('utf-8'))
-    print(p.returncode)
-    #output = await proc.communicate()[0]
-    #if not proc.returncode:
-    #    filename = [line for line in output if line.startswith('[ffmpeg] Destination:')]
-    #    print(filename)
+    print("Fetching %s" % play_url)
+    ffmpeg, youtubedl = get_ffmpeg_path(), get_youtubedl_path()
+    out = get_tmpdir() + 'audio.mp3'
+    ydl = AsyncYouTubeDl(ffmpeg, youtubedl)
+    ydl.download(play_url, extract_audio=True, out_name=out)
 
 
 
-
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    #client = YouTubeClient(app=None, loop=loop)
-    # loop.run_until_complete(test_get_items(client))
-    loop.run_until_complete(get_play_url('hvCVJ62kT8Y', loop))
 
     

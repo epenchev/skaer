@@ -1,3 +1,6 @@
+import os
+import sys
+import os.path
 from aiohttp import web
 
 # Collection format -> name : (path, class, category, cover image)
@@ -11,6 +14,9 @@ class AppManager(web.Application):
         super().__init__()
         self._collections = self._load_media_collections(COLLECTION_MODULES)
         self.setup_api_routes()
+        path = os.path.realpath(os.path.abspath(__file__))
+        sys.path.insert(0, os.path.dirname(os.path.dirname(path)))
+
 
     def _load_media_collections(self, collections):
         """ Load media collections on the fly """
@@ -37,6 +43,7 @@ class AppManager(web.Application):
             return instance.get_info()
         print('Warning: no collection with this id : [%s]' % col_id)
         return None
+
 
     async def get_collection_items(self, col_id):
         if col_id in self._collections:
