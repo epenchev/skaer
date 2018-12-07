@@ -1,38 +1,25 @@
-import os
-import sys
-import os.path
 from aiohttp import web
-
-# Collection format -> name : (path, class, category, cover image)
-COLLECTION_MODULES = (
-    {'YouTube Music': ('media_collections.youtube_music', 'YouTubeClient')},
-    {'YesMovies': ('media_collections.yesmovies', 'YesMoviesChannel')}
+from media import (
+    get_media_classes, get_media
 )
 
+
 class AppManager(web.Application):
+
     def __init__(self):
         super().__init__()
-        self._collections = self._load_media_collections(COLLECTION_MODULES)
+        self._load_media()
         self.setup_api_routes()
-        path = os.path.realpath(os.path.abspath(__file__))
-        sys.path.insert(0, os.path.dirname(os.path.dirname(path)))
 
 
-    def _load_media_collections(self, collections):
-        """ Load media collections on the fly """
-        loaded = {}
-        module_id = 1
-        for col in collections:
-            for name, items in col.items():
-                path, klassname = items
-                module = __import__(path, fromlist=(klassname), level=0)
-                try:
-                    instance = getattr(module, klassname)(self)
-                    loaded[module_id] = (name, instance)
-                    module_id += 1
-                except (AttributeError, TypeError) as err:
-                    print('Warning: module [%s] failed verification, %s' % (name, str(err)))
-        return loaded
+    def _load_media(self):
+        """ Load media sources. """
+        self._media = {}
+        media_id = 1
+        media_classes = get_media_classes()
+        for cls in media_classes:
+            self._media[media_id] = cls(self)
+            media_id += 1
 
     def run(self, listen_port):
         web.run_app(self, port=listen_port)
