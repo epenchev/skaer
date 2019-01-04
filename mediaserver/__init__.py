@@ -23,27 +23,28 @@
 #
 
 
+import os
+import sys
+import signal
+import logging
 import cherrypy
 
+from mediaserver import pathutils
 from mediaserver import configuration as cfg
+
 config = None
 
 
 def start_server():
-    """ Initializes and starts Skaer media server. """
+    ''' Initializes and starts Skaer media server. '''
     SkaerMedia()
 
 
 class SkaerMedia:
-    """Sets up services (configuration, database, etc) and starts the server"""
+    ''' Sets up services (configuration, database, etc) and starts the server. '''
     def __init__(self):
-        self.setup_config()
-
-        if config['media.basedir'] is None:
-            print(_("Invalid basedir. Please provide a valid basedir path."))
-            sys.exit(1)
-        else:
-            log.debug("Basedir is %r", config['media.basedir'])
+        global config
+        config = cfg.load_config()
 
         signal.signal(signal.SIGTERM, SkaerMedia.stop_and_cleanup)
         signal.signal(signal.SIGINT, SkaerMedia.stop_and_cleanup)
@@ -52,61 +53,25 @@ class SkaerMedia:
 
         SkaerMedia.create_pid_file()
         self.start_server(httphandler.HTTPHandler(config))
-        SkaerMedia.delete_pid_file()
+        # SkaerMedia.delete_pid_file()
 
 
     @staticmethod
     def stop_and_cleanup(signal=None, stackframe=None):
-        """Delete the process id file and exit"""
-        SkaerMediaServer.delete_pid_file()
+        ''' Delete the process id file and exit. '''
+        # delete pid file 
         print('Exiting...')
         sys.exit(0)
 
 
     @classmethod
     def create_pid_file(cls):
-        """create a process id file, exit if it already exists"""
-        if pathprovider.pidFileExists():
-            with open(pathprovider.pidFile(), 'r') as pidfile:
-                try:
-                    if not sys.platform.startswith('win'):
-                        # this call is only available on unix systems and throws
-                        # an OSError if the process does not exist.
-                        os.getpgid(int(pidfile.read()))
-                    sys.exit(_('Process id file %s already exists., you can delete this file and restart SkaerMS.' 
-                            % pathprovider.pidFile())
-                except OSError:
-                    print('Stale process id file, removing.')
-                    cls.delete_pid_file()
-        with open(pathprovider.pidFile(), 'w') as pidfile:
-            pidfile.write(str(os.getpid()))
-
- 
-    @classmethod
-    def delete_pid_file(cls):
-        """Delete the process id file, if it exists"""
-        if pathprovider.pidFileExists():
-            os.remove(pathprovider.pidFile())
-        else:
-            print(_("Error removing pid file, doesn't exist!"))
-
-
-    def setup_config(self):
-        """ Updates the internal configuration using the following hierarchy:
-            override_dict > file_config > default_config
-        """
-        defaults = cfg.from_defaults()
-        filecfg = cfg.from_configparser(pathprovider.configurationFile())
-        custom = defaults.replace(filecfg, on_error=log.e)
-        if override_dict:
-            custom = custom.replace(override_dict, on_error=log.e)
-        global config
-        config = custom
+        ''' Create a process id file, exit if it already exists. '''
+        pass
 
 
     def start_server(self, httphandler):
-        """use the configuration to setup and start the cherrypy server
-        """
+        ''' Use the configuration to setup and start the cherrypy server. '''
         cherrypy.config.update({'log.screen': True})
         ipv6_enabled = config['server.ipv6_enabled']
         if config['server.localhost_only']:
@@ -114,26 +79,9 @@ class SkaerMedia:
         else:
             socket_host = "::" if ipv6_enabled else "0.0.0.0"
 
-        resourcedir = os.path.abspath(pathprovider.getResourcePath('res'))
+        resourcedir = os.path.abspath(pathutils.get_resourcepath('res'))
 
-        if config['server.ssl_enabled']:
-            cert = pathprovider.absOrConfigPath(config['server.ssl_certificate'])
-            pkey = pathprovider.absOrConfigPath(config['server.ssl_private_key'])
-            cherrypy.config.update({
-                'server.ssl_certificate': cert,
-                'server.ssl_private_key': pkey,
-                'server.socket_port': config['server.ssl_port'],
-            })
-            # Create second server for redirecting http to https:
-            redirecter = cherrypy._cpserver.Server()
-            redirecter.socket_port = config['server.port']
-            redirecter._socket_host = socket_host
-            redirecter.thread_pool = 10
-            redirecter.subscribe()
-        else:
-            cherrypy.config.update({
-                'server.socket_port': config['server.port'],
-            })
+        cherrypy.config.update({'server.socket_port': config['server.port'],})
 
         cherrypy.config.update({
             'log.error_file': os.path.join(
@@ -145,26 +93,17 @@ class SkaerMedia:
             'tools.sessions.timeout': int(config.get('server.session_duration', 60 * 24)),
         })
 
-        if not config['server.keep_session_in_ram']:
-            sessiondir = os.path.join(
-                pathprovider.getUserDataPath(), 'sessions')
-            if not os.path.exists(sessiondir):
-                os.mkdir(sessiondir)
-            cherrypy.config.update({
-                'tools.sessions.storage_type': "file",
-                'tools.sessions.storage_path': sessiondir,
-            })
-        basedirpath = config['media.basedir']
-        if sys.version_info < (3,0):
-            basedirpath = codecs.encode(basedirpath, 'utf-8')
-            scriptname = codecs.encode(config['server.rootpath'], 'utf-8')
-        else:
-            if needs_serve_file_utf8_fix:
-                # fix cherrypy unicode issue (only for Python3)
-                # see patch to cherrypy.lib.static.serve_file way above and
-                # https://bitbucket.org/cherrypy/cherrypy/issue/1148/wrong-encoding-for-urls-containing-utf-8
-                basedirpath = codecs.decode(codecs.encode(basedirpath, 'utf-8'), 'latin-1')
-            scriptname = config['server.rootpath']
+
+        #if not config['server.keep_session_in_ram']:
+        #    sessiondir = os.path.join(
+        #        pathprovider.getUserDataPath(), 'sessions')
+        #    if not os.path.exists(sessiondir):
+        #        os.mkdir(sessiondir)
+        #    cherrypy.config.update({
+        #        'tools.sessions.storage_type': "file",
+        #        'tools.sessions.storage_path': sessiondir,
+        #    })
+
         cherrypy.tree.mount(
             httphandler, scriptname,
             config={
