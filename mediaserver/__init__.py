@@ -30,10 +30,10 @@ import logging
 import cherrypy
 
 from mediaserver import pathutils
+from mediaserver import httphandler
 from mediaserver import configuration as cfg
 
 config = None
-
 
 def start_server():
     ''' Initializes and starts Skaer media server. '''
@@ -81,11 +81,10 @@ class SkaerMedia:
 
         resourcedir = os.path.abspath(pathutils.get_resourcepath('res'))
 
-        cherrypy.config.update({'server.socket_port': config['server.port'],})
+        cherrypy.config.update({'server.socket_port': config['server.port']})
 
         cherrypy.config.update({
-            'log.error_file': os.path.join(
-                pathprovider.getUserDataPath(), 'server.log'),
+            'log.error_file': os.path.join(pathutils.get_basepath(), 'server.log'),
             'environment': 'production',
             'server.socket_host': socket_host,
             'server.thread_pool': 30,
@@ -93,19 +92,8 @@ class SkaerMedia:
             'tools.sessions.timeout': int(config.get('server.session_duration', 60 * 24)),
         })
 
-
-        #if not config['server.keep_session_in_ram']:
-        #    sessiondir = os.path.join(
-        #        pathprovider.getUserDataPath(), 'sessions')
-        #    if not os.path.exists(sessiondir):
-        #        os.mkdir(sessiondir)
-        #    cherrypy.config.update({
-        #        'tools.sessions.storage_type': "file",
-        #        'tools.sessions.storage_path': sessiondir,
-        #    })
-
         cherrypy.tree.mount(
-            httphandler, scriptname,
+            httphandler, '/',
             config={
                 '/res': {
                     'tools.staticdir.on': True,
@@ -114,24 +102,9 @@ class SkaerMedia:
                     'tools.caching.on': False,
                     'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/javascript', 'text/css'],
                     'tools.gzip.on': True,
-                },
-                '/serve': {
-                    'tools.staticdir.on': True,
-                    'tools.staticdir.dir': basedirpath,
-                    # 'tools.staticdir.index': 'index.html',    if ever needed: in py2 MUST utf-8 encode
-                    'tools.staticdir.content_types': MEDIA_MIMETYPES,
-                    'tools.encode.on': True,
-                    'tools.encode.encoding': 'utf-8',
-                    'tools.caching.on': False,
-                    'tools.cm_auth.on': True,
-                    'tools.cm_auth.httphandler': httphandler,
-                },
-                '/favicon.ico': {
-                    'tools.staticfile.on': True,
-                    'tools.staticfile.filename': resourcedir + '/img/favicon.ico',
                 }})
-        api.v1.mount('/api/v1')
-        log.i(_('Starting server on port %s ...') % config['server.port'])
+        # api.v1.mount('/api/v1')
+        # log.i(_('Starting server on port %s ...') % config['server.port'])
 
         cherrypy.lib.caching.expires(0)  # disable expiry caching
         cherrypy.engine.start()

@@ -88,11 +88,6 @@ def from_defaults():
     # be automatically logged in as admin.
     config['server.localhost_auto_login'] = False
 
-    # Will keep the user sessions in RAM instead of a file in the
-    # configuration directory. This means, that any unsaved
-    # playlists will be lost when the server is restarted.
-    config['server.keep_session_in_ram'] = False
-
     # Duration in minutes of the user sessions. Note that this
     # will not affect auto logged-in users.
     config['server.session_duration'] = 60 * 24
@@ -108,12 +103,11 @@ def from_list(properties):
     # configuration.from_properties(properties)
     pass
 
-
 def to_list(cfg):
     ''' Alias for :meth:`Configuration.to_properties`.'''
     # cfg.to_properties()
 
-def to_mapping(cfg)
+def to_mapping(cfg):
     ''' Configuration to mapping object (dict). '''
     pass
 

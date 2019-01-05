@@ -44,7 +44,7 @@ def get_basepath():
     basepath = ''
     if is_linux():
         if 'HOME' in os.environ:
-            basepath = os.path.join(os.environ['HOME'], data_folder_name)
+            basepath = os.path.join(os.environ['HOME'], base_folder_name)
         else:
             basepath = os.path.join(os.path.expanduser('~'), '.local', 'share', base_folder_name)
     elif is_windows():
