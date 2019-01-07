@@ -28,7 +28,7 @@ def load_config():
 
 
 def from_defaults():
-    ''' Load default configuration. '''
+    """ Load default configuration. """
 
     config = dict()
 
@@ -94,21 +94,21 @@ def from_defaults():
     return config
 
 def from_dict(mapping):
-    ''' Load configuration from dictionary. '''
+    """ Load configuration from dictionary. """
     # configuration.from_mapping()
     pass
 
 def from_list(properties):
-    ''' Load configuration from list of properties. '''
+    """ Load configuration from list of properties. """
     # configuration.from_properties(properties)
     pass
 
 def to_list(cfg):
-    ''' Alias for :meth:`Configuration.to_properties`.'''
+    """ Alias for :meth:`Configuration.to_properties`."""
     # cfg.to_properties()
 
 def to_mapping(cfg):
-    ''' Configuration to mapping object (dict). '''
+    """ Configuration to mapping object (dict). """
     pass
 
 

@@ -43,7 +43,7 @@ except ImportError:
     from backport.urllib import parse
 
 
-'''
+"""
 import audiotranscode
 from tinytag import TinyTag
 
@@ -58,7 +58,7 @@ import cherrymusicserver.metainfo as metainfo
 from cherrymusicserver.util import Performance, MemoryZipFile
 
 from cherrymusicserver.ext import zipstream
-'''
+"""
 import time
 
 debug = True
@@ -70,7 +70,7 @@ class HTTPHandler(object):
     def __init__(self, config):
         self.config = config
 
-        '''
+        """
         template_main = 'res/dist/main.html'
         template_login = 'res/login.html'
         template_firstrun = 'res/firstrun.html'
@@ -78,7 +78,7 @@ class HTTPHandler(object):
         self.mainpage = readRes(template_main)
         self.loginpage = readRes(template_login)
         self.firstrunpage = readRes(template_firstrun)
-        '''
+        """
         self.handlers = {
             'search': self.api_search,
             'rememberplaylist': self.api_rememberplaylist,
@@ -179,9 +179,9 @@ class HTTPHandler(object):
         except (UnicodeDecodeError, ValueError) as e:
             # workaround for python2/python3 jump, filed bug in cherrypy
             # https://bitbucket.org/cherrypy/cherrypy/issue/1216/sessions-python2-3-compability-unsupported
-            log.w(_('''
+            log.w(_("""
             Dropping all sessions! Try not to change between python 2 and 3,
-            everybody has to relogin now.'''))
+            everybody has to relogin now."""))
             cherrypy.session.delete()
             sessionUsername = None
         if sessionUsername is None:
@@ -223,14 +223,14 @@ class HTTPHandler(object):
             return ''
 
     def trans(self, newformat, *path, **params):
-        ''' Transcodes the track given as ``path`` into ``newformat``.
+        """ Transcodes the track given as ``path`` into ``newformat``.
 
             Streams the response of the corresponding
             ``audiotranscode.AudioTranscode().transcodeStream()`` call.
 
             params:
                 bitrate: int for kbps. None or < 1 for default
-        '''
+        """
         if not self.isAuthorized():
             raise cherrypy.HTTPRedirect(self.getBaseUrl(), 302)
         cherrypy.session.release_lock()
