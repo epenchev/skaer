@@ -1,4 +1,4 @@
-class YouTubeMusicMedia(object):
+class YouTubeMusicProvider(object):
 
     def __init__(self, app):
         self._app = app 
@@ -15,7 +15,7 @@ class YouTubeMusicMedia(object):
 
 
     def get_info(self):
-        return { 'description' : 'YouTube music, a media source to fetch music from youtube',
+        return { 'description' : 'YouTube music, a media provider to fetch music from youtube',
                  'cover_image' : 'images/y-music.jpeg',
                  'category'    : 'Music' }
 
