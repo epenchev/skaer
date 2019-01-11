@@ -15,7 +15,8 @@ class YouTubeMusicProvider(object):
 
 
     def get_info(self):
-        return { 'description' : 'YouTube music, a media provider to fetch music from youtube',
+        return { 'name'        : 'YouTube Music'
+                 'description' : 'Media provider to fetch music from youtube',
                  'cover_image' : 'images/y-music.jpeg',
                  'category'    : 'Music' }
 

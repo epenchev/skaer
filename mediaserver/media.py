@@ -26,60 +26,21 @@
 import providers
 
 
-class MediaError(Exception):
-    """ Base class for media errors. """
-    def __init__(self, msg='')
-        super().__init__(msg)
-
-
-class Provider(object):
-    """ Media provider instance. 
-        Gives acces to various media providers ex. youtube """
-    def __init__(self, provid, provider):
-        self._instance = provider
-        self._provid = provid
-
-    @property
-    def items(self):
-        return self._instance.get_items()
-
-    @property
-    def info(self):
-        return self._instance.get_info()
-
-    @property
-    def provid(self):
-        return self._provid
-
-
-class ProviderItem(object):
-    def __init__(self, provider):
-        self._provider = provider
-
-
-
-class Media(object):
+class MediaManager(object):
     """ Manages all media objects (cloud sources, provider sources, disk sources)."""
     def __init__(self):
         self._load_providers()
 
     def _load_providers(self):
-        """ Load media providers. """
-        self._providers = {}
+        """ Create an instance of every provider and mapped to a unique id. """
+        self._providers_map = {}
         provid = 1
         classes = provider.get_classes()
         for cls in classes:
-            self._providers[provid] = MediaProvider(cls(self))
+            self._providers_map[provid] = cls()
             provid += 1
 
     @property
-    def providers(self):
-        """ Get a maping with all media providers """
-        return self._providers.items()
-
-    def get_provider(self, provid):
-        """ Lookup a Provider instance from id """
-        if provid not in self._providers:
-            raise MediaError('No provider with this id : [%s]' % provid)
-        return self_.providers[provid]
+    def providers_map(self):
+        return self._providers_map
 

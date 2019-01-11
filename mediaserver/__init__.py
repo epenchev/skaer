@@ -98,8 +98,8 @@ class SkaerMediaServer:
                 '/': {
                     'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
                     'tools.sessions.on': True,
-                    #'tools.response_headers.on': True,
-                    #'tools.response_headers.headers': [('Content-Type', 'text/plain')],
+                    'tools.response_headers.on': True,
+                    'tools.response_headers.headers': [('Content-Type', 'text/plain')],
                 },
                 '/res': {
                     'tools.staticdir.on': True,

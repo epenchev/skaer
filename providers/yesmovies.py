@@ -5,6 +5,7 @@ class YesMoviesProvider(object):
         self._app = app
 
     def get_info(self):
-        return { 'description' : 'YesMovies media provider',
+        return { 'name'        : 'YesMovies'
+                 'description' : 'YesMovies media provider',
                  'cover_image' : 'images/yes-movies.jpg',
                  'category'    : 'Video' }
