@@ -35,8 +35,8 @@ class MediaManager(object):
         """ Create an instance of every provider and mapped to a unique id. """
         self._providers_map = {}
         provid = 1
-        classes = provider.get_classes()
-        for cls in classes:
+        klasses = providers.get_classes()
+        for cls in klasses:
             self._providers_map[provid] = cls()
             provid += 1
 

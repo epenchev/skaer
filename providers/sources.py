@@ -1,3 +1,3 @@
-from .yt_music import YouTubeMusicMedia
-from .yesmovies import YesMoviesMedia
+from .yt_music import YouTubeMusicProvider
+from .yesmovies import YesMoviesProvider
 

@@ -1,7 +1,8 @@
-class YouTubeMusicProvider(object):
+import requests
 
-    def __init__(self, app):
-        self._app = app 
+
+class YouTubeMusicProvider(object):
+    def __init__(self):
         self._api_key = 'AIzaSyBbaFOsbZ-kmMM969-Tdil5-sPO16UozaA'
         self._language = 'en'  #'bg'
         self._region = 'BG'
@@ -15,13 +16,15 @@ class YouTubeMusicProvider(object):
 
 
     def get_info(self):
-        return { 'name'        : 'YouTube Music'
+        return { 'name'        : 'YouTube Music',
                  'description' : 'Media provider to fetch music from youtube',
                  'cover_image' : 'images/y-music.jpeg',
                  'category'    : 'Music' }
 
+    def entries(self):
+        pass
 
-    async def perform_v3_get_request(self, headers=None, path=None, params=None):
+    def perform_v3_get_request(self, headers=None, path=None, params=None):
         req_params = {'key': self._api_key}
         if params:
             req_params.update(params)
@@ -29,20 +32,18 @@ class YouTubeMusicProvider(object):
         url = self.api_url + path.strip('/')
         if headers:
             req_headers.update(headers)
-        async with aiohttp.ClientSession(headers=req_headers, loop=self._loop) as client:
-            async with client.get(url, params=req_params) as resp:
-                assert resp.status == 200
-                if resp.headers.get('content-type', '').startswith('application/json'):
-                    return await resp.json()
-                else:
-                    return await resp.text('utf-8')
+        r = requests.get(url, params=req_params, headers=req_headers)
+        assert r.status_code == requests.codes.ok
+        if r.headers.get('content-type', '').startswith('application/json'):
+            return r.json()
+        else:
+            return r.content.decode('utf-8')
 
-
-    async def get_music_category_id(self):
+    def get_music_category_id(self):
         params = {'part': 'snippet',
                   'regionCode': self._region,
                   'hl': 'en'}
-        json_result = await self.perform_v3_get_request(path='videoCategories', params=params)
+        json_result = self.perform_v3_get_request(path='videoCategories', params=params)
         for item in json_result['items']:
             if item['snippet']['title'].startswith('Music'):
                 category_id = int(item['id'])
@@ -50,14 +51,14 @@ class YouTubeMusicProvider(object):
         return category_id
 
 
-    async def get_popular_music_videos(self, page_token=None, max_results=None):
+    def get_popular_music_videos(self, page_token=None, max_results=None):
         """
         Returns a list of the most popular music videos for that region.
         :param page_token: fetch a concrete page
         :max_results: max results to return
         :return:
         """
-        category_id = await self.get_music_category_id()
+        category_id = self.get_music_category_id()
         if max_results:
             maxres = max_results
         else:
@@ -71,7 +72,7 @@ class YouTubeMusicProvider(object):
                   'chart': 'mostPopular'}
         if page_token:
             params['pageToken'] = page_token
-        res = await self.perform_v3_get_request(path='videos', params=params)
+        res = self.perform_v3_get_request(path='videos', params=params)
         if 'nextPageToken' in res:
             next_page = res['nextPageToken']
         else:
@@ -148,31 +149,3 @@ class YouTubeMusicProvider(object):
                 break
         return self.perform_v3_get_request(path='search', params=params, quota_optimized=False)
 
-    get_items = get_popular_music_videos
-
-
-async def test_get_items(client, max_res=5):
-    chan_items, total, next_page = await client.get_items(max_results=max_res)
-    while total:
-        total -= len(chan_items)
-        if total < max_res:
-            max_results = total
-        for item in chan_items.items():
-            print(item)
-        print('-------------------')
-        chan_items, _, next_page = await client.get_items(page_token=next_page,
-                                                          max_results=max_res)
-
-
-async def get_play_url(id, loop):
-    play_url = ('https://www.youtube.com/watch?v=%s' % id)
-    print("Fetching %s" % play_url)
-    ffmpeg, youtubedl = get_ffmpeg_path(), get_youtubedl_path()
-    out = get_tmpdir() + 'audio.mp3'
-    ydl = AsyncYouTubeDl(ffmpeg, youtubedl)
-    ydl.download(play_url, extract_audio=True, out_name=out)
-
-
-
-
-    

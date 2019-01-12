@@ -1,4 +1,4 @@
-from .provider import *
+from .sources import *
 
 __all__ = ['get', 'get_classes']
 

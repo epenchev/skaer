@@ -13,7 +13,7 @@ $(function () {
         while (list.children('li').length) {
             list.children('li').remove();
         }
-        // Compile the template​
+        // Compile the template
         var theTemplate = Handlebars.compile(theTemplateScript);
         list.append(theTemplate(data));
     }
@@ -23,7 +23,7 @@ $(function () {
         $('.view-panel').removeClass('visible');
         $('.collections-list').removeClass('visible');
 
-        $.getJSON("/collections", function( data ) {
+        $.getJSON("/providers_list", function( data ) {
             if (collType != '') {
                 var collIndex = 0;
                 data.forEach(function (item) {
