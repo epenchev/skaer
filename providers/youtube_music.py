@@ -14,7 +14,6 @@ class YouTubeMusicProvider(object):
         }
         self.api_url = 'https://www.googleapis.com/youtube/v3/'
 
-
     def get_info(self):
         return { 'name'        : 'YouTube Music',
                  'description' : 'Media provider to fetch music from youtube',
@@ -22,7 +21,8 @@ class YouTubeMusicProvider(object):
                  'category'    : 'Music' }
 
     def entries(self):
-        pass
+        """ Return all entries (popular videos and user's playlists) """
+        self.get_popular_music_videos()
 
     def perform_v3_get_request(self, headers=None, path=None, params=None):
         req_params = {'key': self._api_key}
@@ -78,11 +78,11 @@ class YouTubeMusicProvider(object):
         else:
             next_page = None
 
-        channel_items = {}
+        play_items = {}
         for item in res['items']:
-            channel_items[item['id']] = ( item['snippet']['title'],
-                                          item['snippet']['thumbnails']['medium']['url'] )
-        return channel_items, res['pageInfo']['totalResults'], next_page
+            play_items[item['id']] = ( item['snippet']['title'],
+                                       item['snippet']['thumbnails']['medium']['url'] )
+        return play_items, res['pageInfo']['totalResults'], next_page
 
 
     def get_videos(self, video_id):
