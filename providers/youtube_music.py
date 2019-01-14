@@ -22,7 +22,7 @@ class YouTubeMusicProvider(object):
 
     def entries(self):
         """ Return all entries (popular videos and user's playlists) """
-        self.get_popular_music_videos()
+        return self.get_popular_music_videos()
 
     def perform_v3_get_request(self, headers=None, path=None, params=None):
         req_params = {'key': self._api_key}
@@ -56,7 +56,7 @@ class YouTubeMusicProvider(object):
         Returns a list of the most popular music videos for that region.
         :param page_token: fetch a concrete page
         :max_results: max results to return
-        :return:
+        :return play items, total results, next page token:
         """
         category_id = self.get_music_category_id()
         if max_results:
@@ -78,10 +78,11 @@ class YouTubeMusicProvider(object):
         else:
             next_page = None
 
-        play_items = {}
+        play_items = []
         for item in res['items']:
-            play_items[item['id']] = ( item['snippet']['title'],
-                                       item['snippet']['thumbnails']['medium']['url'] )
+            play_items.append({'id'   : item['id'],
+                               'title': item['snippet']['title'],
+                               'url'  : item['snippet']['thumbnails']['medium']['url']})
         return play_items, res['pageInfo']['totalResults'], next_page
 
 

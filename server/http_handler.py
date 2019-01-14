@@ -51,16 +51,18 @@ class HttpHandler(object):
         return json.dumps(providers)
 
     @cherrypy.expose
-    def provider_entries(self):
+    def provider_entries(self, provid):
         """ Get all entries (PlayLists, PlayItems) for a given media provider. """
-        if 'provid' not in cherrypy.request.params:
+        if 'provid' in cherrypy.request.params:
+            provid = int(provid)
+        else:
             raise cherrypy.HTTPError(404)
-        provid = cherrypy.request.params['provid']
+
         if provid not in self._media.providers_map:
             raise cherrypy.HTTPError(404)
         entries = []
-        elist = self._media.providers_map['provid'].entries()
-        for eid, details in elist:
-            entries.append(dict(details, id=eid, provid=provid))
+        elist, total_res, page_token = self._media.providers_map[provid].entries()
+        for details in elist:
+            entries.append(dict(details, provid=provid))
         return json.dumps(entries)
 

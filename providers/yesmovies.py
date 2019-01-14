@@ -1,6 +1,7 @@
+import requests
+
 
 class YesMoviesProvider(object):
-
     def __init__(self):
         pass
 
@@ -9,4 +10,8 @@ class YesMoviesProvider(object):
                  'description' : 'YesMovies media provider',
                  'cover_image' : 'images/yes-movies.jpg',
                  'category'    : 'Video' }
+
+    def entries(self):
+        """ Return all entries (videos) """
+        return ([], 0, None)
 
