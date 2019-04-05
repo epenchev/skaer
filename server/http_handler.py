@@ -64,5 +64,6 @@ class HttpHandler(object):
         elist, total_res, page_token = self._media.providers_map[provid].entries()
         for details in elist:
             entries.append(dict(details, provid=provid))
+        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         return json.dumps(entries)
 
