@@ -47,7 +47,9 @@ class HttpHandler(object):
         """
         providers = []
         for provid, prov in self._media.providers_map.items():
-            providers.append(dict(prov.get_info(), id=provid)) 
+            providers.append(dict(prov.get_info(), id=provid))
+
+        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         return json.dumps(providers)
 
     @cherrypy.expose

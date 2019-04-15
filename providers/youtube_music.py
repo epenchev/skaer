@@ -17,12 +17,12 @@ class YouTubeMusicProvider(object):
     def get_info(self):
         return { 'name'        : 'YouTube Music',
                  'description' : 'Media provider to fetch music from youtube',
-                 'cover_image' : 'images/y-music.jpeg',
+                 'cover_image' : 'http://localhost:8080/res/images/y-music.jpeg',
                  'category'    : 'Music' }
 
     def entries(self):
         """ Return all entries (popular videos and user's playlists) """
-        return self.get_popular_music_videos()
+        return self.get_popular_music_videos(max_results=50)
 
     def perform_v3_get_request(self, headers=None, path=None, params=None):
         req_params = {'key': self._api_key}
