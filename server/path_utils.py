@@ -34,11 +34,14 @@ pid_filename = 'skaer.pid'       # $HOME/base_folder_name/pid_filename
 def is_windows():
     return sys.platform.startswith('win')
 
+
 def is_linux():
     return sys.platform.startswith('linux')
 
+
 def is_macosx():
     return sys.platform.startswith('darwin')
+
 
 def get_basepath():
     basepath = ''
@@ -59,11 +62,14 @@ def get_basepath():
 def fallbackpath():
     return os.path.join(os.path.expanduser('~'), base_folder_name)
 
+
 def pid_file():
     return os.path.join(get_basepath(), pid_filename)
 
+
 def pid_file_exists():
     return os.path.exists(pidfile())
+
 
 def license_file():
     owndir = os.path.dirname(__file__)
@@ -94,4 +100,3 @@ def stripext(filename):
     if '.' in filename:
         return filename[:filename.rindex('.')]
     return filename
-

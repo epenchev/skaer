@@ -28,6 +28,7 @@ import providers
 
 class MediaManager(object):
     """ Manages all media objects (cloud sources, provider sources, disk sources)."""
+
     def __init__(self):
         self._load_providers()
 
@@ -43,4 +44,3 @@ class MediaManager(object):
     @property
     def providers_map(self):
         return self._providers_map
-

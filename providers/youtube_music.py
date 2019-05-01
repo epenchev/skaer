@@ -50,7 +50,6 @@ class YouTubeMusicProvider(object):
                 break
         return category_id
 
-
     def get_popular_music_videos(self, page_token=None, max_results=None):
         """
         Returns a list of the most popular music videos for that region.
@@ -85,7 +84,6 @@ class YouTubeMusicProvider(object):
                                'url'  : item['snippet']['thumbnails']['medium']['url']})
         return play_items, res['pageInfo']['totalResults'], next_page
 
-
     def get_videos(self, video_id):
         """
         Returns a list of videos that match the API request parameters
@@ -97,7 +95,6 @@ class YouTubeMusicProvider(object):
         params = {'part': 'snippet,contentDetails',
                   'id': video_id}
         return self.perform_v3_get_request(path='videos', params=params)
-
 
     def search(self, q, search_type=['video', 'channel', 'playlist'], channel_id='',
                order='relevance', safe_search='moderate', page_token=''):
@@ -148,5 +145,5 @@ class YouTubeMusicProvider(object):
             if params.get(key) is not None:
                 params['type'] = 'video'
                 break
-        return self.perform_v3_get_request(path='search', params=params, quota_optimized=False)
-
+        res = self.perform_v3_get_request(path='search', params=params)
+        return res

@@ -12,7 +12,7 @@ def get(name):
     """ Returns the provider class with the given name. """
     return globals()[name]
 
+
 def get_classes():
     """ Return the list with all provider classes. """
     return _ALL_CLASSES
-

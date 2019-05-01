@@ -30,7 +30,17 @@ from server import media
 
 class HttpHandler(object):
     """ Handling all HTTP requests for static resources and REST API calls. """
+
     def __init__(self, config):
+        self.handlers = {
+            'providers': self.api_providers,
+            'providerItems': self.api_provider_items,
+             #'collections' : self.api_collections,
+             #'playlists': self.api_playlists,
+             #'search': self.api_search,
+             #'collectionItems': self.api_collection_items,
+             #'playlistItems': self.api_playlist_items,
+        }
         self._media = media.MediaManager()
         self._config = config
 
@@ -41,20 +51,28 @@ class HttpHandler(object):
             raise cherrypy.HTTPRedirect('/res', 302)
 
     @cherrypy.expose
-    def providers_list(self):
+    def api(self, *args, **kwargs):
+        """ Calls the appropriate api function handler from the handlers
+            dict, if available otherwise error is returned.
+        """
+        action = args[0] if args else ''
+        if not action in self.handlers:
+            raise cherrypy.HTTPError(404)
+        handler = self.handlers[action]
+        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
+        return handler(**kwargs)
+
+    def api_providers(self):
         """ Return a list with all media providers and provider details
-            (name, description ..) 
+            (name, description ..)
         """
         providers = []
         for provid, prov in self._media.providers_map.items():
             providers.append(dict(prov.get_info(), id=provid))
-
-        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         return json.dumps(providers)
 
-    @cherrypy.expose
-    def provider_entries(self, provid):
-        """ Get all entries (PlayLists, PlayItems) for a given media provider. """
+    def api_provider_items(self, provid):
+        """ Get all entries/items (PlayLists, PlayItems) for a given media provider. """
         if 'provid' in cherrypy.request.params:
             provid = int(provid)
         else:
@@ -66,6 +84,19 @@ class HttpHandler(object):
         elist, total_res, page_token = self._media.providers_map[provid].entries()
         for details in elist:
             entries.append(dict(details, provid=provid))
-        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         return json.dumps(entries)
 
+    def api_search(self, type, id, qtext):
+        """ Get all entries (PlayLists, PlayItems) for a given media provider. """
+        if 'provid' in cherrypy.request.params:
+            provid = int(provid)
+        else:
+            raise cherrypy.HTTPError(404)
+
+        if provid not in self._media.providers_map:
+            raise cherrypy.HTTPError(404)
+        result = self._media.providers_map[provid].search(qtext)
+        print(result)
+        return json.dumps(result)
+
+    
