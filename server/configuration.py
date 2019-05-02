@@ -92,8 +92,6 @@ def from_defaults():
     # will not affect auto logged-in users.
     config['server.session_duration'] = 60 * 24
 
-    config['log.screen'] = True
-
     return config
 
 def from_dict(mapping):

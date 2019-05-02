@@ -98,9 +98,16 @@ class MediaServer:
                     'tools.staticdir.on': True,
                     'tools.staticdir.dir': resourcedir,
                     'tools.staticdir.index': 'index.html',
-                    'tools.caching.on': False,
+                    'tools.caching.on': True,
+                    'tools.caching.delay': 3600,
                     'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/javascript', 'text/css'],
                     'tools.gzip.on': True,
+                }})
+        cherrypy.tree.mount(
+            handler, '/', config={
+                    '/api': {
+                    'tools.caching.on': False,
+                    'tools.encode.text_only': False, # Will encode all in ('utf8')
                 }})
         # log.i(_('Starting server on port %s ...') % config['server.port'])
         cherrypy.lib.caching.expires(0)  # disable expiry caching

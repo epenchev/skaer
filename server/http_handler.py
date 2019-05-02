@@ -69,6 +69,7 @@ class HttpHandler(object):
         providers = []
         for provid, prov in self._media.providers_map.items():
             providers.append(dict(prov.get_info(), id=provid))
+        cherrypy.response.headers['Content-Type'] = 'application/json'
         return json.dumps(providers)
 
     def api_provider_items(self, provid):
@@ -84,6 +85,7 @@ class HttpHandler(object):
         elist, total_res, page_token = self._media.providers_map[provid].entries()
         for details in elist:
             entries.append(dict(details, provid=provid))
+        cherrypy.response.headers['Content-Type'] = 'application/json'
         return json.dumps(entries)
 
     def api_search(self, type, id, qtext):
@@ -99,4 +101,3 @@ class HttpHandler(object):
         print(result)
         return json.dumps(result)
 
-    
