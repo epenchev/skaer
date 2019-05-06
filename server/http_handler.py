@@ -25,11 +25,12 @@
 
 import json
 import cherrypy
-from server import media
-
+import providers
 
 class HttpHandler(object):
-    """ Handling all HTTP requests for static resources and REST API calls. """
+    """ Handling all HTTP requests for static resources 
+        and REST API calls.
+    """
 
     def __init__(self, config):
         self.handlers = {
@@ -41,7 +42,6 @@ class HttpHandler(object):
              #'collectionItems': self.api_collection_items,
              #'playlistItems': self.api_playlist_items,
         }
-        self._media = media.MediaManager()
         self._config = config
 
     @cherrypy.expose
@@ -54,6 +54,7 @@ class HttpHandler(object):
     def api(self, *args, **kwargs):
         """ Calls the appropriate api function handler from the handlers
             dict, if available otherwise error is returned.
+
         """
         action = args[0] if args else ''
         if not action in self.handlers:
@@ -65,39 +66,48 @@ class HttpHandler(object):
     def api_providers(self):
         """ Return a list with all media providers and provider details
             (name, description ..)
+
         """
-        providers = []
-        for provid, prov in self._media.providers_map.items():
-            providers.append(dict(prov.get_info(), id=provid))
+        media_providers = []
+        prov_map = providers.all()
+        for prvid, prv in prov_map.items():
+            media_providers.append(dict(prv.get_info(), id=prvid))
         cherrypy.response.headers['Content-Type'] = 'application/json'
-        return json.dumps(providers)
+        return json.dumps(media_providers)
 
     def api_provider_items(self, provid):
-        """ Get all entries/items (PlayLists, PlayItems) for a given media provider. """
+        """ Get all entries/items (PlayLists, PlayItems) 
+            for a given media provider.
+
+        """
         if 'provid' in cherrypy.request.params:
             provid = int(provid)
         else:
             raise cherrypy.HTTPError(404)
 
-        if provid not in self._media.providers_map:
+        prov_map = providers.all()
+        if provid not in prov_map:
             raise cherrypy.HTTPError(404)
         entries = []
-        elist, total_res, page_token = self._media.providers_map[provid].entries()
+        elist, total_res, page_token = prov_map[provid].entries()
         for details in elist:
             entries.append(dict(details, provid=provid))
         cherrypy.response.headers['Content-Type'] = 'application/json'
         return json.dumps(entries)
 
     def api_search(self, type, id, qtext):
-        """ Get all entries (PlayLists, PlayItems) for a given media provider. """
+        """ Get all entries (PlayLists, PlayItems)
+            for a given media provider.
+
+        """
         if 'provid' in cherrypy.request.params:
             provid = int(provid)
         else:
             raise cherrypy.HTTPError(404)
-
         if provid not in self._media.providers_map:
             raise cherrypy.HTTPError(404)
-        result = self._media.providers_map[provid].search(qtext)
+        prov_map = providers.all()
+        result = prov_map[provid].search(qtext)
         print(result)
         return json.dumps(result)
 
