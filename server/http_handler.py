@@ -59,6 +59,7 @@ class HttpHandler(object):
         action = args[0] if args else ''
         if not action in self.handlers:
             raise cherrypy.HTTPError(404)
+
         handler = self.handlers[action]
         cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         return handler(**kwargs)
@@ -72,6 +73,7 @@ class HttpHandler(object):
         prov_map = providers.all()
         for prvid, prv in prov_map.items():
             media_providers.append(dict(prv.get_info(), id=prvid))
+
         cherrypy.response.headers['Content-Type'] = 'application/json'
         return json.dumps(media_providers)
 
@@ -88,10 +90,12 @@ class HttpHandler(object):
         prov_map = providers.all()
         if provid not in prov_map:
             raise cherrypy.HTTPError(404)
+
         entries = []
         elist, total_res, page_token = prov_map[provid].entries()
         for details in elist:
             entries.append(dict(details, provid=provid))
+
         cherrypy.response.headers['Content-Type'] = 'application/json'
         return json.dumps(entries)
 

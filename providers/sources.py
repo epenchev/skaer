@@ -1,3 +1,3 @@
-from .youtube_music import YouTubeMusicProvider
+from .youtube_listen import YouTubeListenProvider
 from .yesmovies import YesMoviesProvider
 
