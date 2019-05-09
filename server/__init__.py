@@ -32,6 +32,9 @@ import cherrypy
 from server import path_utils
 from server import http_handler
 from server import configuration as cfg
+from gapi   import key_sets, login
+from base64 import b64decode
+from cherrypy.process.plugins import BackgroundTask
 
 config = None
 
@@ -71,6 +74,32 @@ class MediaServer:
     def delete_pid_file(cls):
         """ Delete process id file. """
         pass
+
+    @classmethod
+    def run_login():
+        """ Run Google OAuth login task. """
+
+        interval_sec = 5
+        client_id = b64decode(key_sets['client_id'])
+        client_secret = b64decode(key_sets['client_secret'])
+
+        def get_access_token():
+            try:
+                login.request_access_token(code, client, secret)
+            except login.LoginError as err:
+                print('Got error from request_access_token: %s'str(err))
+
+        try:
+            json_data = login.request_device_and_user_code(client_id)
+            device_code = json_data['device_code']
+            print('Login to %s with %s' % (json_data['verificatiion_url'], json_data['user_code']))
+            task = BackgroundTask(interval_sec, get_access_token, [device_code, client_id, client_secret])
+            task.run()
+        except login.LoginError as err:
+            print('Google failed: %s', err.message)
+        except KeyError as err:
+            print('Missing json values from API response %s' str(err))
+
 
     def start_server(self, handler):
         """ Set configuration values and run cherrypy server. """
