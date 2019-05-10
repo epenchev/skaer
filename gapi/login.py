@@ -22,8 +22,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-
+import os
+import time
 import requests
+from base64 import b64decode
+from cherrypy.process.plugins import BackgroundTask
+
+
+key_sets = {
+    'id': b'ODE5MjIzNTA2MjM0LWtoZjlxaDRsODl2YW4wZjZuOXBxa3Nwb2F0bms2NnNiLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t',
+    'secret': b'X1Y4eG45RUxiYzh6cnJJTV94cW80Tm5R'
+}
 
 
 class ApiError(Exception):
@@ -143,7 +152,7 @@ def request_access_token(code, client_id, client_secret):
 
 
 
-def refresh_token(refresh_token, client_id, client_secret):
+def refresh_access_token(refresh_token, client_id, client_secret):
     """
     Refresh an access token if it has expired.
     One must use the refresh token
@@ -190,6 +199,51 @@ def revoke_token(refresh_token):
                         (err.status_code, err.message))
 
 
+
+def run_service():
+    """ Run Google OAuth login procedure and update expired tokens. """
+    def export_token(json_data):
+        os.environ['access_token'] = json_data['access_token']
+        os.environ['refresh_token'] = json_data['refresh_token']
+        os.environ['expires_in'] =  str(int(time.time()) + int(json_data['expires_in']))
+
+    def get_access_token(code, client, secret):
+        try:
+            if not os.environ.get('access_token', ''):
+                json_data = request_access_token(code, client, secret)
+                export_token(json_data)
+                return
+        except LoginError as err:
+            print('Got error from request_access_token: %s' % str(err))
+            return
+        except KeyError as err:
+            if json_data.get('error', '') == 'authorization_pending':
+                print('Waiting user to authorize app')
+            else:
+                print('Unexpected error')
+            return
+        # Refresh access token if is about to expire
+        if (int(os.environ['expires_in']) - int(time.time())) <= 100:
+            json_data = refresh_access_token(ref_token, client, secret)
+            export_token(json_data)
+
+    interval_sec = 5 
+    client_id = str(b64decode(key_sets['id']), 'utf-8')
+    client_secret = str(b64decode(key_sets['secret']), 'utf-8')
+    try:
+        json_data = request_device_and_user_code(client_id)
+        device_code = json_data['device_code']
+        print('Login to %s with %s' % (json_data['verification_url'], json_data['user_code']))
+        # Run the service in a background task
+        task = BackgroundTask(interval_sec, get_access_token, [device_code, client_id, client_secret])
+        task.run()
+    except LoginError as err:
+        print('Google failed: %s', err.message)
+    except KeyError as err:
+        print('Missing json values from API response %s' % str(err))
+
+
+
 # Some testing examples
 
 if __name__ == '__main__':
@@ -198,7 +252,7 @@ if __name__ == '__main__':
     #json_data = request_device_and_user_code(client_id)
     device_code = ''
     #json_data = request_access_token(device_code, client_id, client_secret)
-    json_data = refresh_token('', client_id, client_secret)
+    json_data = refresh_access_token('', client_id, client_secret)
     #revoke_token('')
     print(json_data)
 

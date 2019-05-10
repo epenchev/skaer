@@ -23,10 +23,5 @@
 #
 
 
-key_sets = {
-    'id': b'ODE5MjIzNTA2MjM0LWtoZjlxaDRsODl2YW4wZjZuOXBxa3Nwb2F0bms2NnNiLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t',
-    'secret': b'ZWtFNWQybHFMV1pzU1hSWk16VnJTSEJzTjNObVpXdDQ='
-}
-
-__all__ = ['login', 'key_sets']
+__all__ = ['login']
 
