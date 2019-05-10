@@ -236,7 +236,7 @@ def run_service():
         print('Login to %s with %s' % (json_data['verification_url'], json_data['user_code']))
         # Run the service in a background task
         task = BackgroundTask(interval_sec, get_access_token, [device_code, client_id, client_secret])
-        task.run()
+        task.start()
     except LoginError as err:
         print('Google failed: %s', err.message)
     except KeyError as err:
