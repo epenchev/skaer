@@ -106,7 +106,7 @@ def request_device_and_user_code(client_id):
 
     post_data = {
         'client_id': client_id,
-        'scope': 'email profile'
+        'scope': 'https://www.googleapis.com/auth/youtube'
     }
 
     url = 'https://accounts.google.com/o/oauth2/device/code'
@@ -224,7 +224,7 @@ def run_service():
             return
         # Refresh access token if is about to expire
         if (int(os.environ['expires_in']) - int(time.time())) <= 100:
-            json_data = refresh_access_token(ref_token, client, secret)
+            json_data = refresh_access_token(os.environ['refresh_token'], client, secret)
             export_token(json_data)
 
     interval_sec = 5 

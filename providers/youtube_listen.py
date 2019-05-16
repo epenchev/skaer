@@ -1,9 +1,9 @@
+import os
 import requests
 
 
 class YouTubeListenProvider(object):
     def __init__(self):
-        self._api_key = 'AIzaSyBbaFOsbZ-kmMM969-Tdil5-sPO16UozaA'
         self._language = 'en'
         self._region = 'BG'
         self._max_results = 10
@@ -15,9 +15,9 @@ class YouTubeListenProvider(object):
         self.api_url = 'https://www.googleapis.com/youtube/v3/'
 
     def get_info(self):
-        return { 
+        return {
             'name'        : 'YouTube Listen',
-            'description' : 'Media provider to listen only youtube content',
+            'description' : 'Media provider to listen youtube music content',
             'cover_image' : 'http://localhost:8080/res/images/y-music.jpeg',
             'category'    : 'Music'
         }
@@ -27,7 +27,8 @@ class YouTubeListenProvider(object):
         return self.get_popular_music_videos(max_results=50)
 
     def v3_get_request(self, headers=None, path=None, params=None):
-        req_params = {'key': self._api_key}
+        access_token = os.environ.get('access_token', '')
+        req_params = { 'access_token': access_token }
         if params:
             req_params.update(params)
         req_headers = self.req_headers
