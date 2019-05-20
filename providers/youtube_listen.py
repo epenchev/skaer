@@ -166,3 +166,11 @@ class YouTubeListenProvider(object):
         res = self.v3_get_request(path='search', params=params)
         return res
 
+    def get_playlists(self):
+        params = {
+            'part': 'contentDetails',
+            'mine': 'true',
+            'hl': self._language
+        }
+        return self.v3_get_request(path='playlists', params=params)
+

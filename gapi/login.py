@@ -202,9 +202,11 @@ def revoke_token(refresh_token):
 
 def run_service():
     """ Run Google OAuth login procedure and update expired tokens. """
+
     def export_token(json_data):
         os.environ['access_token'] = json_data['access_token']
-        os.environ['refresh_token'] = json_data['refresh_token']
+        if 'refresh_token' in json_data:
+            os.environ['refresh_token'] = json_data['refresh_token']
         os.environ['expires_in'] =  str(int(time.time()) + int(json_data['expires_in']))
 
     def get_access_token(code, client, secret):
