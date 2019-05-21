@@ -41,7 +41,6 @@ class HttpHandler(object):
              #'search': self.api_search,
              #'collectionItems': self.api_collection_items,
              #'playlistItems': self.api_playlist_items,
-             'provPlaylists': self.api_prov_playlists
         }
         self._config = config
 
@@ -93,7 +92,7 @@ class HttpHandler(object):
             raise cherrypy.HTTPError(404)
 
         entries = []
-        elist, total_res, page_token = prov_map[provid].entries()
+        elist = prov_map[provid].entries()
         for details in elist:
             entries.append(dict(details, provid=provid))
 
@@ -115,20 +114,5 @@ class HttpHandler(object):
         result = prov_map[provid].search(qtext)
         print(result)
         return json.dumps(result)
-
-    def api_prov_playlists(self, provid):
-        if 'provid' in cherrypy.request.params:
-            provid = int(provid)
-        else:
-            raise cherrypy.HTTPError(404)
-
-        prov_map = providers.all()
-        if provid not in prov_map:
-            raise cherrypy.HTTPError(404)
-        result = prov_map[provid].get_playlists()
-        print(result)
-        cherrypy.response.headers['Content-Type'] = 'application/json'
-        return json.dumps(result)
-
 
 

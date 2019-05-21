@@ -13,5 +13,5 @@ class YesMoviesProvider(object):
 
     def entries(self):
         """ Return all entries (videos) """
-        return ([], 0, None)
+        return []
 

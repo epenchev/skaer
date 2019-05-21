@@ -204,6 +204,9 @@ def run_service():
     """ Run Google OAuth login procedure and update expired tokens. """
 
     def export_token(json_data):
+        # Pure debug info
+        print('Set access_token=%s' % json_data['access_token'])
+
         os.environ['access_token'] = json_data['access_token']
         if 'refresh_token' in json_data:
             os.environ['refresh_token'] = json_data['refresh_token']
