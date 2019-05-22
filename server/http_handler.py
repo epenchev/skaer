@@ -22,10 +22,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-
-import json
 import cherrypy
-import providers
+from server.api_dispatcher import Application
+
 
 class HttpHandler(object):
     """ Handling all HTTP requests for static resources 
@@ -33,16 +32,8 @@ class HttpHandler(object):
     """
 
     def __init__(self, config):
-        self.handlers = {
-            'providers': self.api_providers,
-            'providerItems': self.api_provider_items,
-             #'collections' : self.api_collections,
-             #'playlists': self.api_playlists,
-             #'search': self.api_search,
-             #'collectionItems': self.api_collection_items,
-             #'playlistItems': self.api_playlist_items,
-        }
         self._config = config
+        self._app = Application()
 
     @cherrypy.expose
     def index(self):
@@ -56,13 +47,10 @@ class HttpHandler(object):
             dict, if available otherwise error is returned.
 
         """
-        action = args[0] if args else ''
-        if not action in self.handlers:
-            raise cherrypy.HTTPError(404)
-
-        handler = self.handlers[action]
+        path = args[0] if args else ''
         cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
-        return handler(**kwargs)
+        cherrypy.response.headers['Content-Type'] = 'application/json'
+        return self._app.call(cherrypy.request.method, path, **kwargs)
 
     def api_providers(self):
         """ Return a list with all media providers and provider details
@@ -73,12 +61,10 @@ class HttpHandler(object):
         prov_map = providers.all()
         for prvid, prv in prov_map.items():
             media_providers.append(dict(prv.get_info(), id=prvid))
-
-        cherrypy.response.headers['Content-Type'] = 'application/json'
         return json.dumps(media_providers)
 
     def api_provider_items(self, provid):
-        """ Get all entries/items (PlayLists, PlayItems) 
+        """ Get all entries/items (PlayLists, PlayItems)
             for a given media provider.
 
         """
@@ -112,7 +98,6 @@ class HttpHandler(object):
             raise cherrypy.HTTPError(404)
         prov_map = providers.all()
         result = prov_map[provid].search(qtext)
-        print(result)
         return json.dumps(result)
 
 

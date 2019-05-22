@@ -43,7 +43,7 @@ class YouTubeListenProvider(object):
             items.append({
                     'id': pl['id'],
                     'title': pl['snippet']['title'],
-                    'url': pl['snippet']['thumbnails']['medium']['url']
+                    'url': pl['snippet']['thumbnails']['medium']['url'],
                     'type': 'playlist item'
                     })
         return items
@@ -175,7 +175,7 @@ class YouTubeListenProvider(object):
             play_items.append({
                         'id': item['id'],
                         'title': item['snippet']['title'],
-                        'url': item['snippet']['thumbnails']['medium']['url']
+                        'url': item['snippet']['thumbnails']['medium']['url'],
                         'type': 'music item'
                     })
         return play_items, res['pageInfo']['totalResults'], next_page

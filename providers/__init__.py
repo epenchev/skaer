@@ -34,7 +34,7 @@ _all_classes = [
 ]
 
 # Load all providers and create an instance for every provider.
-_providers_map = { 
+_providers_map = {
     (prvid + 1): cls() for prvid, cls in enumerate(_all_classes) 
 }
 
