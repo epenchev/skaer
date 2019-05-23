@@ -72,12 +72,12 @@ def api_post_request(url, post_data, headers):
         'User-Agent': 'Mozilla/5.0 Firefox/66.0',
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    # apply custom headers setup
+
     if headers:
         req_headers.update(headers)
 
-    result = requests.post(url, data=post_data, headers=req_headers)
     try:
+        result = requests.post(url, data=post_data, headers=req_headers)
         # We always expect content-type from google to be application/json 
         if result.headers.get('content-type', '').startswith('application/json'):
             json_data = result.json()
@@ -86,6 +86,8 @@ def api_post_request(url, post_data, headers):
         return json_data
     except ValueError:
         raise ApiError(result.status_code, 'Missing json data in response')
+    #except requests.ConnectionError as err:
+    #    raise LoginError(str(err))
 
     if result.status_code != requests.codes.ok:
         raise ApiError(result.status_code, json_data)

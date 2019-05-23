@@ -7,7 +7,7 @@ class YouTubeListenProvider(object):
     def __init__(self):
         self._language = 'en'
         self._region = 'BG'
-        self._max_results = 50
+        self._max_results = 50 
         self.req_headers = {
             'Host': 'www.googleapis.com',
             'User-Agent': 'Mozilla/5.0 Firefox/66.0',
@@ -24,7 +24,7 @@ class YouTubeListenProvider(object):
             'category'    : 'Music'
         }
 
-    def entries(self):
+    def playlists(self):
         """ Public API call,
             return all entries (popular music videos and user's playlists). """
 
@@ -39,12 +39,11 @@ class YouTubeListenProvider(object):
         max_results = self._max_results - plists['pageInfo']['totalResults']
         items, total_res, next_page = self._get_popular_music_videos(max_results=max_results)
         for pl in plists['items']:
-            print(pl)
             items.append({
                     'id': pl['id'],
                     'title': pl['snippet']['title'],
                     'url': pl['snippet']['thumbnails']['medium']['url'],
-                    'type': 'playlist item'
+                    'type': 'playlist '
                     })
         return items
 

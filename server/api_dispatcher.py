@@ -1,41 +1,6 @@
 import json
 import providers
-
-
-class Router(object):
-
-    def __init__(self):
-        self._handlers = {
-            'get': {}, 'post': {}, 'put': {}, 'delete': {}
-        }
- 
-    def lookup(self, method, path):
-        print(self._handlers)
-        return self._handlers[method][path]
-
-    def get(self, path):
-        def _decorator(func):
-            self._handlers['get'][path] = func
-            return func
-        return _decorator
-    
-    def post(self, path):
-        def _decorator(func):
-            self._handlers['post'][path] = func
-            return func
-        return _decorator
-
-    def put(self, path):
-        def _decorator(func):
-            self._handlers['put'][path] = func
-            return func
-        return _decorator
-
-    def delete(self, path):
-        def _decorator(func):
-            self._handlers['delete'][path] = func
-            return func
-        return _decorator
+from server.api_router import Router, RouterError
 
 
 router = Router()
@@ -69,13 +34,13 @@ class Application(object):
         """ List/get all Playlists. 
             If provider_id is set return playlists for a given media provider.
         """
-
+        playlists = []
         if provider_id:
-            prov = providers.all()[provider_id]
+            prov = providers.get(int(provider_id))
             playlists = []
-            entries_list = prov.entries()
+            entries_list = prov.playlists()
             for details in entries_list:
-                playlists.append(dict(details, provid=provid))
+                playlists.append(dict(details, provid=provider_id))
         return json.dumps(playlists)
 
     def get_collections(self):
