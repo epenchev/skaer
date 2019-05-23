@@ -16,7 +16,8 @@ class YouTubeListenProvider(object):
         self.api_url = 'https://www.googleapis.com/youtube/v3/'
 
     def get_info(self):
-        """ Public API call. """
+        """ Public API call, get provider description. """
+
         return {
             'name'        : 'YouTube Listen',
             'description' : 'Media provider to listen youtube music content',
@@ -35,17 +36,40 @@ class YouTubeListenProvider(object):
                                          'maxResults': str(self._max_results),
                                          'hl': self._language}
                                      )
-        # Merge results from the popular music videos and user's playlists.
         max_results = self._max_results - plists['pageInfo']['totalResults']
-        items, total_res, next_page = self._get_popular_music_videos(max_results=max_results)
+        res_playlists = []
         for pl in plists['items']:
-            items.append({
+            res_playlists.append({
                     'id': pl['id'],
                     'title': pl['snippet']['title'],
                     'url': pl['snippet']['thumbnails']['medium']['url'],
                     'type': 'playlist '
                     })
-        return items
+        # Add popular music videos playlists
+        res_playlists.append({
+                'id': 'popular',
+                'title': 'Popular music',
+                'url':  'http://localhost:8080/res/images/y-music.jpeg'
+            })
+        return res_playlists
+
+    def playlist_items(self, playlist_id):
+        """ Public API call, return all of the playlist items. """
+        
+        play_items = []
+        if playlist_id == 'popular':
+            items, total, next_page = self._get_popular_music_videos()
+            for item in items:
+                play_items.append({
+                    'id': item['id'],
+                    'title': item['snippet']['title'],
+                    'thumbnail': item['snippet']['thumbnails']['medium']['url']
+                })
+        else:
+            # TODO get the playlist from youtube
+            pass
+        return play_items
+
 
 
     def search(self, q, search_type=['video', 'channel', 'playlist'],
@@ -169,14 +193,5 @@ class YouTubeListenProvider(object):
         else:
             next_page = None
 
-        play_items = []
-        for item in res['items']:
-            play_items.append({
-                        'id': item['id'],
-                        'title': item['snippet']['title'],
-                        'url': item['snippet']['thumbnails']['medium']['url'],
-                        'type': 'music item'
-                    })
-        return play_items, res['pageInfo']['totalResults'], next_page
-
+        return res['items'], res['pageInfo']['totalResults'], next_page
 

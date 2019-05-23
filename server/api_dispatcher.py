@@ -28,7 +28,6 @@ class Application(object):
             media_providers.append(dict(prov.get_info(), id=prvid))
         return json.dumps(media_providers)
 
-
     @router.get('playlists')
     def get_playlists(self, provider_id=None):
         """ List/get all Playlists. 
@@ -37,11 +36,18 @@ class Application(object):
         playlists = []
         if provider_id:
             prov = providers.get(int(provider_id))
-            playlists = []
             entries_list = prov.playlists()
             for details in entries_list:
                 playlists.append(dict(details, provid=provider_id))
         return json.dumps(playlists)
+
+    @router.get('playlistItems')
+    def get_playlist_items(self, playlist_id, provider_id=None):
+        play_items = []
+        if provider_id:
+            prov = providers.get(int(provider_id))
+            play_items = prov.playlist_items(playlist_id)
+        return json.dumps(play_items)
 
     def get_collections(self):
         pass
