@@ -55,7 +55,7 @@ class YouTubeListenProvider(object):
 
     def playlist_items(self, playlist_id):
         """ Public API call, return all of the playlist items. """
-        
+
         play_items = []
         if playlist_id == 'popular':
             items, total, next_page = self._get_popular_music_videos()
@@ -66,8 +66,18 @@ class YouTubeListenProvider(object):
                     'thumbnail': item['snippet']['thumbnails']['medium']['url']
                 })
         else:
-            # TODO get the playlist from youtube
-            pass
+            result = self._v3_get_request(path='playlistItems',
+                                          params={
+                                            'part': 'snippet',
+                                            'maxResults': str(self._max_results),
+                                            'playlistId': playlist_id
+                                          })
+            for item in result['items']:
+                play_items.append({
+                    'id': item['snippet']['resourceId']['videoId'],
+                    'title': item['snippet']['title'],
+                    'thumbnail': item['snippet']['thumbnails']['medium']['url']
+                })
         return play_items
 
 
