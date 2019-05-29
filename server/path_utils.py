@@ -77,18 +77,22 @@ def license_file():
     basedir = os.path.abspath(basedir)
     return os.path.join(basedir, 'COPYING')
 
+
 def assure_folder_exists(folder, subfolders=['']):
     for subfolder in subfolders:
         dirpath = os.path.join(folder, subfolder)
         if not os.path.exists(dirpath):
             os.makedirs(dirpath)
 
+
 def readres(path):
-    with codecs.open(getResourcePath(path), encoding='utf-8') as f:
+    with codecs.open(get_resourcepath(path), encoding='utf-8') as f:
         return f.read()
+
 
 def get_resourcepath(dirname):
     return os.path.abspath(os.path.join(os.path.dirname( __file__  ), os.pardir, dirname))
+
 
 def filename(path, pathtofile=False):
     if pathtofile:
@@ -96,7 +100,12 @@ def filename(path, pathtofile=False):
     else:
         return os.path.split(path)[1]
 
+
 def stripext(filename):
     if '.' in filename:
         return filename[:filename.rindex('.')]
     return filename
+
+
+def get_streampath():
+    return os.path.join(get_basepath() + 'stream')

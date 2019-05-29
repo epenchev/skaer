@@ -1,5 +1,6 @@
 import json
 import providers
+from server import path_utils
 from server.api_router import Router, RouterError
 
 
@@ -43,11 +44,24 @@ class Application(object):
 
     @router.get('playlistItems')
     def get_playlist_items(self, playlist_id, provider_id=None):
+        """ Return all the items in a playlist."""
+
         play_items = []
         if provider_id:
             prov = providers.get(int(provider_id))
             play_items = prov.playlist_items(playlist_id)
         return json.dumps(play_items)
+
+    @router.get('play')
+    def play_item(self, item_id, provider_id=None):
+        """ Start playing a specific media item. """
+        if provider_id:
+            prov = providers.get(int(provider_id))
+            # May return a file system link, in case file is extracted audio.
+            prov.stream_url(item_id)
+            streampath = path_utils.get_streampath()
+            return json.dumps(streampath)
+
 
     def get_collections(self):
         pass
