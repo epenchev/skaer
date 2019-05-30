@@ -1,3 +1,4 @@
+import os
 import json
 import providers
 from server import path_utils
@@ -55,12 +56,17 @@ class Application(object):
     @router.get('play')
     def play_item(self, item_id, provider_id=None):
         """ Start playing a specific media item. """
+
         if provider_id:
             prov = providers.get(int(provider_id))
             # May return a file system link, in case file is extracted audio.
-            prov.stream_url(item_id)
-            streampath = path_utils.get_streampath()
-            return json.dumps(streampath)
+            url = prov.stream_url(item_id)
+            if url.startswith('file'):
+                streamdir = path_utils.get_streampath()
+                path_utils.assure_folder_exists(streamdir)
+                dst = os.path.join(streamdir, os.path.split(url)[1])
+                os.rename(url.lstrip('file:'), dst)
+            return json.dumps(dst)
 
 
     def get_collections(self):

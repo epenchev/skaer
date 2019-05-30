@@ -93,7 +93,7 @@ class YouTubeListenProvider(object):
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download(['https://www.youtube.com/watch?v=%s' % item_id])
-        return os.path.join('/tmp', item_id)
+        return 'file:/' + os.path.join('/tmp', item_id + '.mp3')
 
 
     def search(self, q, search_type=['video', 'channel', 'playlist'],

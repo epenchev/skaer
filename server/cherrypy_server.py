@@ -130,8 +130,14 @@ class CherrypyServer:
                 '/api': {
                     'tools.caching.on': False,
                     'tools.encode.text_only': False, # Will encode all in ('utf8')
-                }
-        })
+                },
+                '/stream': {
+                    'tools.staticdir.on': True,
+                    'tools.staticdir.dir': path_utils.get_streampath(),
+                    'tools.caching.on': True,
+                    'tools.caching.delay': 3600, 
+                },
+            })
 
         # Run login service for Google based API's
         login.run_service()

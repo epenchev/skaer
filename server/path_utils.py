@@ -108,4 +108,4 @@ def stripext(filename):
 
 
 def get_streampath():
-    return os.path.join(get_basepath() + 'stream')
+    return os.path.join(get_basepath(), 'stream')
