@@ -109,4 +109,5 @@ def stripext(filename):
 
 
 def get_streampath():
+    """ Path to store media stream resources. """
     return os.path.join(get_basepath(), 'stream')

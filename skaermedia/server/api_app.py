@@ -68,6 +68,10 @@ class Application(object):
                 os.rename(url.lstrip('file:'), dst)
             return json.dumps(dst)
 
+    @router.get('google_auth')
+    def get_google_auth(self):
+        """ Get """
+        pass
 
     def get_collections(self):
         pass
