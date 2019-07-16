@@ -1,21 +1,20 @@
 import os
 import json
-import providers
-from server import path_utils
-from server.api_router import Router, RouterError
-
-
-router = Router()
+from skaermedia import providers
+from skaermedia.server import path_utils
+from skaermedia.server.api_router import Router
 
 
 class Application(object):
+
+    router = Router()
 
     def call(self, method, path, **kwargs):
         """ Calls the appropriate api function handler from the handlers
             dict, if available otherwise error is returned.
 
         """
-        api_handler = router.lookup(method.lower(), path)
+        api_handler = Application.router.lookup(method.lower(), path)
         return api_handler(self, **kwargs)
 
     @router.get('providers')
@@ -32,8 +31,9 @@ class Application(object):
 
     @router.get('playlists')
     def get_playlists(self, provider_id=None):
-        """ List/get all Playlists. 
+        """ List/get all Playlists.
             If provider_id is set return playlists for a given media provider.
+
         """
         playlists = []
         if provider_id:

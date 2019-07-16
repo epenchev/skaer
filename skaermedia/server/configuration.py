@@ -69,7 +69,7 @@ def from_defaults():
     config['browser.pure_database_lookup'] = False
 
     # The port the server will listen to.
-    config['server.port'] = 8080
+    config['server.port'] = 8844
 
     # When set to true, the server will listen on a IPv6
     # socket instead of IPv4

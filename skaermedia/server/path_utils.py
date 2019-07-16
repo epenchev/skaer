@@ -27,10 +27,6 @@ import sys
 import codecs
 
 
-base_folder_name = '.skaermedia' # $HOME/base_folder_name
-pid_filename = 'skaer.pid'       # $HOME/base_folder_name/pid_filename
-
-
 def is_windows():
     return sys.platform.startswith('win')
 
@@ -46,24 +42,29 @@ def is_macosx():
 def get_basepath():
     basepath = ''
     if is_linux():
+        base_folder = '.skaer'
         if 'HOME' in os.environ:
-            basepath = os.path.join(os.environ['HOME'], base_folder_name)
+            basepath = os.path.join(os.environ['HOME'], base_folder)
         else:
-            basepath = os.path.join(os.path.expanduser('~'), '.local', 'share', base_folder_name)
+            basepath = os.path.join(os.path.expanduser('~'), '.local', 'share', base_folder)
     elif is_windows():
-        basepath = os.path.join(os.environ['APPDATA'], base_folder_name)
+        base_folder = 'Skaer'
+        basepath = os.path.join(os.environ['APPDATA'], base_folder)
     elif is_macosx():
-        basepath = os.path.join(os.path.expanduser('~'), 'Library', 'Application Support', base_folder_name)
+        base_folder = '.skaer'
+        basepath = os.path.join(os.path.expanduser('~'), 'Library', 'Application Support', base_folder)
     if not basepath:
         basepath = fallbackpath()
     return basepath
 
 
 def fallbackpath():
-    return os.path.join(os.path.expanduser('~'), base_folder_name)
+    base_folder = 'skaer'
+    return os.path.join(os.path.expanduser('~'), base_folder)
 
 
 def pid_file():
+    pid_filename = 'skaer.pid'
     return os.path.join(get_basepath(), pid_filename)
 
 

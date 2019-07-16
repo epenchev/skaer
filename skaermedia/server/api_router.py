@@ -36,7 +36,6 @@ class RouterError(Exception):
         return self._message
 
 
-
 class Router(object):
     """
     Automate the process of routing different Rest API calls

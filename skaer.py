@@ -22,11 +22,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
+from skaermedia import server
 
-from server.cherrypy_server import CherrypyServer
 
-
-def run():
-    """ Initializes and starts skaer media server. """
-    CherrypyServer()
+if __name__ == '__main__':
+    server.run()
 

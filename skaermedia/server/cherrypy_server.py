@@ -26,19 +26,17 @@
 import os
 import sys
 import signal
-import logging
 import cherrypy
-from server import path_utils
-from server import configuration as cfg
-from gapi   import login
-from server.api_dispatcher import Application
+from skaermedia.server import configuration as cfg, path_utils
+from skaermedia.gapi import login
+from skaermedia.server.api_app import Application
 
 
 config = None
 
 
 class HTTP_Handler(object):
-    """ Handling all HTTP requests for static resources 
+    """ Handling all HTTP requests for static resources
         and REST API calls.
     """
 
@@ -63,7 +61,6 @@ class HTTP_Handler(object):
         return self._app.call(cherrypy.request.method, path, **kwargs)
 
 
-
 class CherrypyServer:
     """ Sets up services (configuration, database, etc) and starts the server. """
     def __init__(self):
@@ -82,7 +79,7 @@ class CherrypyServer:
     @staticmethod
     def stop_and_cleanup(signal=None, stackframe=None):
         """ Delete the process id file and exit. """
-        # delete pid file 
+        # delete pid file
         print('Exiting...')
         sys.exit(0)
 
@@ -135,7 +132,7 @@ class CherrypyServer:
                     'tools.staticdir.on': True,
                     'tools.staticdir.dir': path_utils.get_streampath(),
                     'tools.caching.on': True,
-                    'tools.caching.delay': 3600, 
+                    'tools.caching.delay': 3600,
                 },
             })
 
@@ -153,5 +150,3 @@ def _cm_auth_tool(handler):
 cherrypy.tools.cm_auth = cherrypy.Tool(
     'before_handler', _cm_auth_tool, priority=70)
     # priority=70 -->> make tool run after session is locked (at 50)
-
-
