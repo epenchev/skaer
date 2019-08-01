@@ -24,8 +24,12 @@
 
 import os
 import time
+import sqlite3
 import requests
 from base64 import b64decode
+
+from skaermedia.server import path_utils
+
 from cherrypy.process.plugins import BackgroundTask
 
 
@@ -65,6 +69,25 @@ class LoginError(Exception):
         return self._message
 
 
+def get_oauth_id_secret():
+    """ Get global Oauth id and secret from DB. """
+
+    with sqlite3.connect(path_utils.get_databasepath()) as conn:
+        r = conn.cursor().execute('SELECT '
+                                  'base64_oauth_id, '
+                                  'base64_oauth_secret FROM glogin').fetchone()
+        id, secret = tuple(r)
+    return str(b64decode(id), 'utf-8'), str(b64decode(secret), 'utf-8')
+
+
+def get_user_oauth():
+    """ Get verification Oauth url and user code from DB. """
+
+    with sqlite3.connect(path_utils.get_databasepath()) as conn:
+        r = conn.cursor().execute('SELECT verification_url, user_code from glogin').fetchone()
+        verf_url, user_code = tuple(r)
+    return verf_url, user_code
+
 
 def api_post_request(url, post_data, headers):
     req_headers = {
@@ -78,7 +101,7 @@ def api_post_request(url, post_data, headers):
 
     try:
         result = requests.post(url, data=post_data, headers=req_headers)
-        # We always expect content-type from google to be application/json 
+        # We always expect content-type from google to be application/json
         if result.headers.get('content-type', '').startswith('application/json'):
             json_data = result.json()
         else:
@@ -234,13 +257,16 @@ def run_service():
             json_data = refresh_access_token(os.environ['refresh_token'], client, secret)
             export_token(json_data)
 
-    interval_sec = 5 
-    client_id = str(b64decode(key_sets['id']), 'utf-8')
-    client_secret = str(b64decode(key_sets['secret']), 'utf-8')
+    interval_sec = 5
+    client_id, client_secret = get_oauth_id_secret();
     try:
         json_data = request_device_and_user_code(client_id)
         device_code = json_data['device_code']
-        print('Login to %s with %s' % (json_data['verification_url'], json_data['user_code']))
+        user_code = json_data['user_code']
+        verification_url = json_data['verification_url']
+        with sqlite3.connect(path_utils.get_databasepath()) as conn:
+            conn.execute('UPDATE glogin SET device_code=?, user_code=?, verification_url=?',
+                         (device_code, user_code, verification_url))
         # Run the service in a background task
         task = BackgroundTask(interval_sec, get_access_token, [device_code, client_id, client_secret])
         task.start()

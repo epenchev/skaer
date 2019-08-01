@@ -27,9 +27,9 @@ import os
 import sys
 import signal
 import cherrypy
-from skaermedia.server import configuration as cfg, path_utils
+from skaermedia.server import configuration, path_utils
 from skaermedia.gapi import login
-from skaermedia.server.api_app import Application
+from skaermedia.server.api_app import AppInterface
 
 
 config = None
@@ -41,7 +41,7 @@ class HTTP_Handler(object):
     """
 
     def __init__(self):
-        self._app = Application()
+        self._api = AppInterface()
 
     @cherrypy.expose
     def index(self):
@@ -58,14 +58,14 @@ class HTTP_Handler(object):
         path = args[0] if args else ''
         cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         cherrypy.response.headers['Content-Type'] = 'application/json'
-        return self._app.call(cherrypy.request.method, path, **kwargs)
+        return self._api.call(cherrypy.request.method, path, **kwargs)
 
 
 class CherrypyServer:
     """ Sets up services (configuration, database, etc) and starts the server. """
     def __init__(self):
         global config
-        config = cfg.load_config()
+        config = configuration.load()
 
         signal.signal(signal.SIGTERM, CherrypyServer.stop_and_cleanup)
         signal.signal(signal.SIGINT, CherrypyServer.stop_and_cleanup)

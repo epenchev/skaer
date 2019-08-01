@@ -23,7 +23,7 @@
 #
 
 
-def load_config():
+def load():
     return from_defaults()
 
 

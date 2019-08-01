@@ -48,13 +48,18 @@ def get_basepath():
         else:
             basepath = os.path.join(os.path.expanduser('~'), '.local', 'share', base_folder)
     elif is_windows():
-        base_folder = 'Skaer'
+        base_folder = 'skaer'
         basepath = os.path.join(os.environ['APPDATA'], base_folder)
     elif is_macosx():
         base_folder = '.skaer'
         basepath = os.path.join(os.path.expanduser('~'), 'Library', 'Application Support', base_folder)
+
     if not basepath:
         basepath = fallbackpath()
+
+    if not os.path.exists(basepath):
+        os.makedirs(basepath)
+
     return basepath
 
 
@@ -110,4 +115,13 @@ def stripext(filename):
 
 def get_streampath():
     """ Path to store media stream resources. """
-    return os.path.join(get_basepath(), 'stream')
+    streampath = os.path.join(get_basepath(), 'stream')
+    if not os.path.exists(streampath):
+        os.makedirs(streampath)
+    return streampath
+
+
+def get_databasepath():
+    """ Location to the global database file. """
+    dbfile = 'datastore.db'
+    return os.path.join(get_basepath(), dbfile)

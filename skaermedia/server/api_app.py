@@ -2,19 +2,24 @@ import os
 import json
 from skaermedia import providers
 from skaermedia.server import path_utils
+from skaermedia.gapi import login as glogin
 from skaermedia.server.api_router import Router
 
 
-class Application(object):
+class AppInterface(object):
+    """ Application interface exposed for public use. """
 
     router = Router()
 
     def call(self, method, path, **kwargs):
-        """ Calls the appropriate api function handler from the handlers
-            dict, if available otherwise error is returned.
+        """ Lookup api function handler for method and path,
+            if no handler is registered an error is returned.
+            :param method: HTTP method (GET, POST ..)
+            :param path: URI path for this request.
+            :param kwargs: API call supplied arguments.
 
         """
-        api_handler = Application.router.lookup(method.lower(), path)
+        api_handler = AppInterface.router.lookup(method.lower(), path)
         return api_handler(self, **kwargs)
 
     @router.get('providers')
@@ -70,7 +75,14 @@ class Application(object):
 
     @router.get('google_auth')
     def get_google_auth(self):
-        """ Get """
+        """ Get verification Oauth url
+            and device code to register device with Google API.
+
+        """
+        verf_url, user_code = glogin.get_user_oauth()
+        return json.dumps({'url': verf_url, 'user_code': user_code})
+
+
         pass
 
     def get_collections(self):
