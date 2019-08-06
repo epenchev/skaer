@@ -30,6 +30,7 @@ from base64 import b64decode
 
 from skaermedia.server import path_utils
 
+import cherrypy
 from cherrypy.process.plugins import BackgroundTask
 
 
@@ -229,9 +230,6 @@ def run_service():
     """ Run Google OAuth login procedure and update expired tokens. """
 
     def export_token(json_data):
-        # Pure debug info
-        print('Set access_token=%s' % json_data['access_token'])
-
         os.environ['access_token'] = json_data['access_token']
         if 'refresh_token' in json_data:
             os.environ['refresh_token'] = json_data['refresh_token']
@@ -244,21 +242,18 @@ def run_service():
                 export_token(json_data)
                 return
         except LoginError as err:
-            print('Got error from request_access_token: %s' % str(err))
+            cherrypy.log('Got error from request_access_token: %s' % str(err), traceback=True)
             return
         except KeyError as err:
-            if json_data.get('error', '') == 'authorization_pending':
-                print('Waiting user to authorize app')
-            else:
-                print('Unexpected error')
+            if json_data.get('error', '') != 'authorization_pending':
+                cherrypy.log('Got Unexpected error', traceback=True)
             return
         # Refresh access token if is about to expire
-        if (int(os.environ['expires_in']) - int(time.time())) <= 100:
             json_data = refresh_access_token(os.environ['refresh_token'], client, secret)
             export_token(json_data)
 
     interval_sec = 5
-    client_id, client_secret = get_oauth_id_secret();
+    client_id, client_secret = get_oauth_id_secret()
     try:
         json_data = request_device_and_user_code(client_id)
         device_code = json_data['device_code']
@@ -271,9 +266,9 @@ def run_service():
         task = BackgroundTask(interval_sec, get_access_token, [device_code, client_id, client_secret])
         task.start()
     except LoginError as err:
-        print('Google failed: %s', err.message)
+        cherrypy.log('Google failed: %s', err.message, traceback=True)
     except KeyError as err:
-        print('Missing json values from API response %s' % str(err))
+        cherrypy.log('Missing json values from API response %s' % str(err), traceback=True)
 
 
 

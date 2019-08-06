@@ -82,9 +82,6 @@ class AppInterface(object):
         verf_url, user_code = glogin.get_user_oauth()
         return json.dumps({'url': verf_url, 'user_code': user_code})
 
-
-        pass
-
     def get_collections(self):
         pass
 
