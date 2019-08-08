@@ -27,10 +27,10 @@ import os
 import sys
 import signal
 import cherrypy
-from skaermedia.server import configuration, path_utils
-from skaermedia.gapi import login
-from skaermedia.server.api_app import AppInterface
 
+from skaermedia.server import configuration, path_utils
+from skaermedia.gapi.login import OauthLoginService
+from skaermedia.server.api_app import AppInterface
 
 config = None
 
@@ -136,9 +136,10 @@ class CherrypyServer:
                 },
             })
 
-        # Run login service for Google based API's
-        login.run_service()
-        # log.i(_('Starting server on port %s ...') % config['server.port'])
+        # Start login service for Google based API's
+        glogin = OauthLoginService()
+        glogin.run()
+        # Run cherrypy engine
         cherrypy.lib.caching.expires(0)  # disable expiry caching
         cherrypy.engine.start()
         cherrypy.engine.block()

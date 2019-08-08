@@ -79,8 +79,9 @@ class AppInterface(object):
             and device code to register device with Google API.
 
         """
-        verf_url, user_code = glogin.get_user_oauth()
-        return json.dumps({'url': verf_url, 'user_code': user_code})
+        oauth = glogin.OauthParams()
+        return json.dumps({'url': oauth.get_login()['verification_url'],
+                           'user_code': oauth.get_login()['user_code']})
 
     def get_collections(self):
         pass
