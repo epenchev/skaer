@@ -157,22 +157,24 @@ class YouTubeListenProvider(object):
         res = self.v3_get_request(path='search', params=params)
         return res
 
-
     def _v3_get_request(self, headers=None, path=None, params=None):
         access_token = os.environ.get('access_token', '')
         req_params = { 'access_token': access_token }
         if params:
             req_params.update(params)
+
         req_headers = self.req_headers
         url = self.api_url + path.strip('/')
         if headers:
             req_headers.update(headers)
-        r = requests.get(url, params=req_params, headers=req_headers)
-        assert r.status_code == requests.codes.ok
-        if r.headers.get('content-type', '').startswith('application/json'):
-            return r.json()
+
+        response = requests.get(url, params=req_params, headers=req_headers)
+        if response.status_code != requests.codes.ok:
+            response.raise_for_status()
+        if response.headers.get('content-type', '').startswith('application/json'):
+            return response.json()
         else:
-            return r.content.decode('utf-8')
+            return response.content.decode('utf-8')
 
     def _get_music_category_id(self):
         params = {

@@ -115,12 +115,10 @@ class OauthClient(object):
             response = requests.post(url, data=data, headers=req_headers)
             if response.status_code != requests.codes.ok:
                 response.raise_for_status()
-            # We always expect content-type to be application/json
             if response.headers.get('content-type', '').startswith('application/json'):
-                json_data = response.json()
+                return response.json()
             else:
                 raise OauthClientError('Unexpected content-type in response')
-            return json_data
         except ValueError:
             raise OauthClientError('Missing json data in response')
 
@@ -164,14 +162,14 @@ class OauthClient(object):
         url = 'https://www.googleapis.com/oauth2/v4/token'
         try:
             json_data = OauthClient.post_request(url, data, {'Host': 'www.googleapis.com'})
-            if json_data.get('error', '') != 'authorization_pending':
-                raise OauthClientError(str(json_data))
+            if 'error' in json_data:
+                return None
+            return json_data
         except requests.HTTPError as err:
             if err.response.json().get('error', '') == 'authorization_pending':
-                json_data = err.response.json()
+                return None
             else:
                 raise
-        return json_data
 
     def refresh_access_token(self, refresh_token):
         """
@@ -191,7 +189,7 @@ class OauthClient(object):
         url = 'https://www.googleapis.com/oauth2/v4/token'
         json_data = OauthClient.post_request(url, data, {'Host': 'www.googleapis.com'})
         if 'error' in json_data:
-            raise OauthClientError(str(json_data))
+            return None
         return json_data
 
     def revoke_token(self, refresh_token):
@@ -213,8 +211,17 @@ class OauthLoginService(object):
         self._client = OauthClient()
         self._interval_sec = interval_sec
 
-    @staticmethod
-    def export_token(token_data):
+    def token_has_expired(self):
+        """
+        Check if token has expired.
+        """
+        expires = int(os.environ.get('expires_in', '0'))
+        return (expires and (expires - int(time.time())) <= 10)
+
+    def export_token(self, token_data):
+        """
+        Export token in the global environment.
+        """
         os.environ['access_token'] = token_data['access_token']
         if 'refresh_token' in token_data:
             os.environ['refresh_token'] = token_data['refresh_token']
@@ -222,15 +229,16 @@ class OauthLoginService(object):
 
     def get_access_token(self):
         try:
-            if os.environ.get('access_token', '') == '':
+            if 'access_token' not in os.environ:
                 token_data = self._client.request_access_token()
-                if not 'error' in token_data:
-                    OauthLoginService.export_token(token_data)
+                if token_data:
+                    self.export_token(token_data)
+                return
             else:
-                # Check if token has expired
-                if (int(os.environ['expires_in']) - int(time.time())) <= 10:
-                    token_data = self._client.refresh_access_token(os.environ['refresh_token'])
-                    OauthLoginService.export_token(token_data)
+                if self.token_has_expired():
+                    refresh_token = os.environ.get('refresh_token', None)
+                    token_data = self._client.refresh_access_token(refresh_token)
+                    self.export_token(token_data)
         except OauthClientError as err:
             cherrypy.log(str(err), traceback=True)
 
