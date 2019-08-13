@@ -4,6 +4,7 @@ from skaermedia import providers
 from skaermedia.server import path_utils
 from skaermedia.gapi import login as glogin
 from skaermedia.server.api_router import Router
+from skaermedia.streaming import streamer
 
 
 class AppInterface(object):
@@ -58,20 +59,14 @@ class AppInterface(object):
             play_items = prov.playlist_items(playlist_id)
         return json.dumps(play_items)
 
-    @router.get('play')
-    def play_item(self, item_id, provider_id=None):
-        """ Start playing a specific media item. """
+    @router.get('playstream')
+    def play_item(self, item_id):
+        """ Stream media item.
+            item_id can presentet as url.
+        """
 
-        if provider_id:
-            prov = providers.get(int(provider_id))
-            # May return a file system link, in case file is extracted audio.
-            url = prov.stream_url(item_id)
-            if url.startswith('file'):
-                streamdir = path_utils.get_streampath()
-                path_utils.assure_folder_exists(streamdir)
-                dst = os.path.join(streamdir, os.path.split(url)[1])
-                os.rename(url.lstrip('file:'), dst)
-            return json.dumps(dst)
+        s = streamer.Streamer()
+        return json.dumps(s.url(item_id))
 
     @router.get('google_auth')
     def get_google_auth(self):

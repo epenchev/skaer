@@ -30,7 +30,7 @@ class YouTubeListenProvider(object):
         """ Public API call,
             return all entries (popular music videos and user's playlists). """
 
-        plists = self._v3_get_request(path='playlists',
+        plists = self.playstream(path='playlists',
                                       params={
                                          'part': 'snippet',
                                          'mine': 'true',
@@ -57,14 +57,14 @@ class YouTubeListenProvider(object):
     def playlist_items(self, playlist_id):
         """ Public API call, return all of the playlist items. """
 
-        play_items = []
+        list_items = []
         if playlist_id == 'popular':
             items, total, next_page = self._get_popular_music_videos()
             for item in items:
-                play_items.append({
+                list_items.append({
                     'id': item['id'],
                     'title': item['snippet']['title'],
-                    'thumbnail': item['snippet']['thumbnails']['medium']['url']
+                    'thumbnail': item['snippet']['thumbnails']['medium']['url'],
                 })
         else:
             result = self._v3_get_request(path='playlistItems',
@@ -74,15 +74,16 @@ class YouTubeListenProvider(object):
                                             'playlistId': playlist_id
                                           })
             for item in result['items']:
-                play_items.append({
+                list_items.append({
                     'id': item['snippet']['resourceId']['videoId'],
                     'title': item['snippet']['title'],
                     'thumbnail': item['snippet']['thumbnails']['medium']['url']
                 })
-        return play_items
+        return list_items
 
     def stream_url(self, item_id):
         """ Extract the stream url for a given item. """
+
         ydl_opts = {
             'format': 'best',
             'outtmpl': '/tmp/%(id)s.%(ext)s',
@@ -182,8 +183,7 @@ class YouTubeListenProvider(object):
             'regionCode': self._region,
             'hl': 'en'
         }
-        json_result = self._v3_get_request(path='videoCategories',
-                                                  params=params)
+        json_result = self._v3_get_request(path='videoCategories', params=params)
         for item in json_result['items']:
             if item['snippet']['title'].startswith('Music'):
                 category_id = int(item['id'])
