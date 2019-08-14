@@ -81,20 +81,14 @@ class YouTubeListenProvider(object):
                 })
         return list_items
 
-    def stream_url(self, item_id):
-        """ Extract the stream url for a given item. """
+    def playback_url(self, item_id):
+        """ Extract the audio stream url for item_id. """
 
-        ydl_opts = {
-            'format': 'best',
-            'outtmpl': '/tmp/%(id)s.%(ext)s',
-            'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192', }],
-        }
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download(['https://www.youtube.com/watch?v=%s' % item_id])
-        return 'file:/' + os.path.join('/tmp', item_id + '.mp3')
+        with youtube_dl.YoutubeDL() as ydl:
+            outlist = ydl.extract_info(item_id, download=False)
+            audio_tracks = [f for f in outlist['formats'] if 'audio only' in f['format']]
+            best_audio = sorted(audio_tracks, key=lambda audio: audio['abr'])[-1]
+        return best_audio['url']
 
 
     def search(self, q, search_type=['video', 'channel', 'playlist'],

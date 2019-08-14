@@ -26,6 +26,7 @@
 import os
 import youtube_dl
 import requests
+from base64 import b64encode
 from skaermedia.server.path_utils import get_streampath
 
 
@@ -34,23 +35,57 @@ class Streamer(object):
     def __init__(self):
         pass
 
-    def url(self, item_id):
-        """ Extract the stream url for a given item.
-            Item is stream item object.
-        """
+    def url(self, item_id, provider=None):
+        """ Extract the stream url for a given item_id. """
 
-        target_path = os.path.join(get_streampath(), item_id)
+        streamid = str(b64encode(item_id.encode()), 'utf-8')
+        if provider:
+            target_url = provider.playback_url(item_id)
+            self.download_file(target_url, os.path.join(get_streampath(), streamid))
+        host = 'localhost'
+        port  = '8844'
+        return 'http://%s:%s/stream/%s' % (host, port, streamid)
+
+    def download_audio(self):
         ydl_opts = {
             'format': 'best',
-            'outtmpl': target_path,
+            'outtmpl': '/tmp/%(id)s.%(ext)s',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
                 'preferredquality': '192', }],
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([item_id])
+            ydl.download(['https://www.youtube.com/watch?v=%s' % item_id])
+        return 'file:/' + os.path.join('/tmp', item_id + '.mp3')
 
-        host = 'localhost'
-        port  = '8844'
-        return 'http://%s:s/stream/%s' % (host, port, item.id)
+    def download_file(self, url, dstpath, credentials=None):
+        """
+        Download a file from HTTP url.
+        :param url: The source HTTP URL.
+        :param dstpath: Destination path to store the downloaded file,
+                        if path dosen't exists it will be created.
+        :param credentials: A tuple in the form (user, password)
+                            if url requires authentication.
+        :return:
+        """
+        kwargs = { 'stream': True }
+        if credentials:
+            user, password = credentials
+            kwargs['auth'] = (user, password)
+
+        with requests.get(url, **kwargs) as r:
+            if r.status_code != requests.codes.ok:
+                r.raise_for_status()
+            os.makedirs(os.path.split(dstpath)[0], exist_ok=True)
+            if r.headers['content-type'] in ('text/plain', 'applicaton/xml', 'text/html'):
+                openmode = 'w'
+            else:
+                openmode = 'wb'
+            with open(dstpath, openmode) as f:
+                if openmode.endswith('b'):
+                    for chunk in r.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+                else:
+                    f.write(r.text)

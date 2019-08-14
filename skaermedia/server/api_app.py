@@ -59,14 +59,16 @@ class AppInterface(object):
             play_items = prov.playlist_items(playlist_id)
         return json.dumps(play_items)
 
-    @router.get('playstream')
-    def play_item(self, item_id):
-        """ Stream media item.
-            item_id can presentet as url.
-        """
+    @router.get('stream')
+    def play_item(self, item_id, provider_id=None):
+        """ Get the playback media stream for media item. """
 
         s = streamer.Streamer()
-        return json.dumps(s.url(item_id))
+        if provider_id:
+            prov = providers.get(int(provider_id))
+            return json.dumps(s.url(item_id, prov))
+        else:
+            return json.dumps(s.url(item_id))
 
     @router.get('google_auth')
     def get_google_auth(self):
