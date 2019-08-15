@@ -30,7 +30,7 @@ class YouTubeListenProvider(object):
         """ Public API call,
             return all entries (popular music videos and user's playlists). """
 
-        plists = self.playstream(path='playlists',
+        plists = self._v3_get_request(path='playlists',
                                       params={
                                          'part': 'snippet',
                                          'mine': 'true',
