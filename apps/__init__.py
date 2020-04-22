@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
 #
-# Skaer media server
+# skaer media streamer
 # Copyright (c) 2019 Emil Penchev
 #
 # Project page:
-#   http://skaermedia.org
+#   http://skaer.org
 #
 # licensed under GNU GPL version 3 (or later)
 #
@@ -23,5 +22,30 @@
 #
 
 
-__all__ = ['login']
+from .sources import *
+
+__all__ = ['all', 'load']
+
+all_apps = None 
+
+
+def load():
+    """
+    Get the class for every app from the globals dictionary.
+    Load all apps and create an instance for every app.
+
+
+    """
+    global all_apps
+    klasses = [klass for name, klass in globals().items() if name.endswith('App')]
+    all_apps = [cls() for cls in klasses]
+
+
+
+def all():
+    """ 
+    Return a list containing every app instance.
+    """
+    global all_apps
+    return all_apps
 

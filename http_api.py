@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
 #
-# Skaer media server
+# skaer media streamer
 # Copyright (c) 2019 Emil Penchev
 #
 # Project page:
@@ -23,30 +22,22 @@
 #
 
 
-
-from .sources import *
-
-__all__ = ['all', 'get']
-
-# Get the class for every provider from the globals dictionary.
-_all_classes = [
-    klass for name, klass in globals().items() if name.endswith('Provider')
-]
-
-# Load all providers and create an instance for every provider.
-_providers_map = {
-    (prvid + 1): cls() for prvid, cls in enumerate(_all_classes) 
-}
+import os
+import apps
+import cherrypy
 
 
-def all():
-    """ Return a dictionary object containing 
-        every provider instance mapped with unique id.
-    """
-    return _providers_map
+class ServerApi(object):
+    """ Server REST API. """
 
+    @cherrypy.expose('apps')
+    @cherrypy.tools.allow(methods=['GET'])
+    @cherrypy.tools.json_out()
+    def get_apps(self):
+        """ Return a list with information about all loaded media apps
+            (name, description ..)
 
-def get(provider_id):
-    """ Lookup provider by provider id. """
-    return _providers_map[provider_id]
+        """
+        return [app.info for app in apps.all()]
+
 

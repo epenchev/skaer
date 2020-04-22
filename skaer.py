@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+
 #
-# Skaer media server
+# skaer media streamer
 # Copyright (c) 2019 Emil Penchev
 #
 # Project page:
@@ -22,9 +23,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-from skaermedia import server
 
+import sys
+
+
+if __package__ is None and not hasattr(sys, 'frozen'):
+    import os.path
+    path = os.path.realpath(os.path.abspath(__file__))
+    sys.path.insert(0, os.path.dirname(os.path.dirname(path)))
+
+from server import Server
 
 if __name__ == '__main__':
-    server.run()
+    Server.run()
 
